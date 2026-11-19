@@ -1,6 +1,6 @@
 # Microservice UML Mapping Specification
 
-This document defines how microservice concepts map to UML elements and stereotypes, as well as the UML relationships used between them. It documents the **modeling rules**; it does not imply that code generation or OCL validation is already implemented.
+This document defines how microservice concepts map to UML elements and stereotypes, as well as the UML relationships used between them. It documents the **modeling rules**; it does not imply that code generation or EVL validation is already implemented.
 
 ## 1. Project Information
 
@@ -197,11 +197,14 @@ between elements.
 | REL-12 | `«Service»` | `Dependency` | `«Repository»` | Service accesses persistence operations |
 | REL-13 | `«Service»` | `Dependency` | `«Service»` | One service uses another service |
 | REL-14 | `«Repository»` | `Dependency` | `«Entity»` | Repository accesses a database table |
+| REL-16 | `«Route»` | `Dependency` | `Operation` owned by `«Repository»` | Endpoint calls one or more repository methods |
 
 **Notes:**
 - Routers may bypass the Service layer for simple operations.
 - Service-to-Service dependencies are optional.
 - Dependencies do not imply structural ownership.
+- REL-16 is operation-level: the supplier is a plain UML Operation with no stereotype. The
+  profile does not represent this link; it is checked only by EVL (CON-21).
 
 ### 4.3 Association Relationships
 
@@ -249,16 +252,47 @@ than between individual application-model instances.
 
 ## 5. Constraints and Validation
 
-Keep all OCL/validation rules here instead of repeating them in every element mapping.
+Keep all EVL validation rules here instead of repeating them in every element mapping.
+Rules are written in EVL (Epsilon Validation Language) and run against the model from a
+separate `.evl` file; they are not stored in the profile. The `.evl` file is not yet
+implemented, so every rule below is `Proposed`.
 
-| ID | Candidate constraint | Status |
-|---|---|---|
+`constraint` blocks report errors, `critique` blocks report warnings.
 
+| ID | Context | Constraint | Kind | Source | Status |
+|---|---|---|---|---|---|
+| CON-01 | `«Router»` | Owned by an `«ApplicationService»` Component | constraint | REL-01 | Proposed |
+| CON-02 | `«Router»` | `prefix` is set and starts with `/` | constraint | MAP-08 | Proposed |
+| CON-03 | `«Router»` | Every `ownedOperation` has `«Route»` applied | constraint | REL-05 | Proposed |
+| CON-04 | `«Router»` | No two `«Route»` operations share the same (`method`, `path`) pair | constraint | MAP-04 | Proposed |
+| CON-05 | `«Router»` | Has at least one `«Route»` operation | critique | MAP-08 | Proposed |
+| CON-06 | `«Route»` | Owning Class has `«Router»` applied | constraint | MAP-04, REL-05 | Proposed |
+| CON-07 | `«Route»` | `method` is set; `path` is set and starts with `/` | constraint | MAP-04 | Proposed |
+| CON-08 | `«Route»` | Every `{name}` segment in `path` matches an `in` parameter called `name` | constraint | MAP-04 | Proposed |
+| CON-09 | `«Service»`, `«Repository»` | Owned by an `«ApplicationService»` Component | constraint | REL-02, REL-03 | Proposed |
+| CON-10 | `«Entity»` | Owned by a `«DatabaseService»` Component | constraint | REL-04 (see Section 6) | Proposed |
+| CON-11 | `«Entity»` | At least one `ownedAttribute` with `isID = true` | constraint | PROP-02 | Proposed |
+| CON-12 | `«Entity»` | Every `ownedAttribute` has a type | constraint | PROP-03 | Proposed |
+| CON-13 | `«ContainerizedService»` | `hostPort` and `containerPort` are in `1..65535` | constraint | MAP-00, MAP-01, MAP-02 | Proposed |
+| CON-14 | `«ContainerizedService»` | `hostPort` is unique across all containerized services | constraint | MAP-00 | Proposed |
+| CON-15 | `«DatabaseService»` | `databaseName` and `databaseVolume` are non-empty | constraint | MAP-02 | Proposed |
+| CON-16 | `«ApplicationService»` | Depends on at least one `«DatabaseService»` | critique | REL-09 | Proposed |
+| CON-17 | `Dependency` (incl. `Usage`) | Client/supplier pair is one of REL-09 to REL-14 or REL-16 | constraint | Section 4.2 | Proposed |
+| CON-18 | `Association` | Both member ends are typed by `«Entity»` classes | constraint | REL-15 | Proposed |
+| CON-19 | `Association` | Each member end has an explicit multiplicity | constraint | Section 4.3 | Proposed |
+| CON-20 | `Class` | At most one of `«Entity»`, `«Service»`, `«Repository»`, `«Router»` is applied | constraint | MAP-06 to MAP-09 | Proposed |
+| CON-21 | `«Route»` | Has a `Dependency` to at least one `Operation` owned by a `«Repository»` class | constraint | REL-16 | Proposed |
 
+### 5.1 EVL Implementation
+
+The rules live in [`validation/microservices.evl`](../validation/microservices.evl); each
+message starts with its `CON-xx` id. See the README for how to run it in Eclipse.
 
 ## 6. Open Modeling Decisions
 
 - **Completeness:** Add any missing permissible UML relationships before declaring Section 4 an exhaustive allowlist.
+- **Entity ownership (CON-10):** REL-04 says `«DatabaseService»` owns `«Entity»`, but the booking reference model places `Booking` and `SeatHold` under `booking-service` (`«ApplicationService»`). Decide which is right before implementing CON-10; the reference model fails it as written.
+- **Cross-service dependencies (CON-17):** A Usage from one `«ApplicationService»` to another service's `«Router»` is not in the Section 4.2 allowlist. Decide whether to add it before CON-17 is enforced.
 
 ## 7. Completion Checklist
 
