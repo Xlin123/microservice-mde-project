@@ -1,6 +1,114 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<uml:Model xmi:version="20131001" xmlns:xmi="http://www.omg.org/spec/XMI/20131001" xmlns:uml="http://www.eclipse.org/uml2/5.0.0/UML" xmi:id="_KAGX0N6hEfGkSeqV3pN_Lw" name="MicroServiceModels">
-  <packageImport xmi:type="uml:PackageImport" xmi:id="_KGq54N6hEfGkSeqV3pN_Lw">
-    <importedPackage xmi:type="uml:Model" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#_0"/>
-  </packageImport>
-</uml:Model>
+<xmi:XMI xmi:version="20131001" xmlns:xmi="http://www.omg.org/spec/XMI/20131001" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:MicroservicesProfile="http:///schemas/MicroservicesProfile/_tSf2QN4kEfGkSeqV3pN_Lw/3" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmlns:uml="http://www.eclipse.org/uml2/5.0.0/UML" xsi:schemaLocation="http:///schemas/MicroservicesProfile/_tSf2QN4kEfGkSeqV3pN_Lw/3 ../MicroservicesProfile/MicroservicesProfile.profile.uml#_tSf2Qd4kEfGkSeqV3pN_Lw">
+  <uml:Model xmi:id="_KAGX0N6hEfGkSeqV3pN_Lw" name="MicroServiceModels">
+    <packageImport xmi:type="uml:PackageImport" xmi:id="_KGq54N6hEfGkSeqV3pN_Lw">
+      <importedPackage xmi:type="uml:Model" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#_0"/>
+    </packageImport>
+    <packagedElement xmi:type="uml:Package" xmi:id="_OPVP8ORVEfG9kLpTJft29g" name="booking">
+      <packagedElement xmi:type="uml:Component" xmi:id="_bh0ZsORVEfG9kLpTJft29g" name="booking-service">
+        <interfaceRealization xmi:type="uml:InterfaceRealization" xmi:id="_bk-svc-realises-api" client="_bh0ZsORVEfG9kLpTJft29g" supplier="_m9TlkORVEfG9kLpTJft29g" contract="_m9TlkORVEfG9kLpTJft29g"/>
+        <packagedElement xmi:type="uml:Class" xmi:id="_bk-Booking" name="Booking">
+          <ownedAttribute xmi:type="uml:Property" xmi:id="_bk-Booking.id" name="id" isID="true">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Integer"/>
+          </ownedAttribute>
+          <ownedAttribute xmi:type="uml:Property" xmi:id="_bk-Booking.eventId" name="eventId">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Integer"/>
+          </ownedAttribute>
+          <ownedAttribute xmi:type="uml:Property" xmi:id="_bk-Booking.customerEmail" name="customerEmail">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+          </ownedAttribute>
+          <ownedAttribute xmi:type="uml:Property" xmi:id="_bk-Booking.status" name="status" type="_bk-BookingStatus"/>
+          <ownedAttribute xmi:type="uml:Property" xmi:id="_bk-Booking.createdAt" name="createdAt" type="_bk-DateTime"/>
+          <ownedAttribute xmi:type="uml:Property" xmi:id="_bk-Booking.holds" name="holds" type="_bk-SeatHold" aggregation="composite" association="_bk-Booking-holds">
+            <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_bk-Booking.holds.lower"/>
+            <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_bk-Booking.holds.upper" value="*"/>
+          </ownedAttribute>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Class" xmi:id="_bk-SeatHold" name="SeatHold">
+          <ownedAttribute xmi:type="uml:Property" xmi:id="_bk-SeatHold.id" name="id" isID="true">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Integer"/>
+          </ownedAttribute>
+          <ownedAttribute xmi:type="uml:Property" xmi:id="_bk-SeatHold.seatLabel" name="seatLabel">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+          </ownedAttribute>
+          <ownedAttribute xmi:type="uml:Property" xmi:id="_bk-SeatHold.priceCents" name="priceCents">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Integer"/>
+          </ownedAttribute>
+          <ownedAttribute xmi:type="uml:Property" xmi:id="_bk-SeatHold.expiresAt" name="expiresAt" type="_bk-DateTime"/>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Association" xmi:id="_bk-Booking-holds" name="Booking_holds" memberEnd="_bk-Booking.holds _bk-Booking-holds.booking">
+          <ownedEnd xmi:type="uml:Property" xmi:id="_bk-Booking-holds.booking" name="booking" type="_bk-Booking" association="_bk-Booking-holds"/>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Enumeration" xmi:id="_bk-BookingStatus" name="BookingStatus">
+          <ownedLiteral xmi:type="uml:EnumerationLiteral" xmi:id="_bk-BookingStatus.PENDING" name="PENDING"/>
+          <ownedLiteral xmi:type="uml:EnumerationLiteral" xmi:id="_bk-BookingStatus.CONFIRMED" name="CONFIRMED"/>
+          <ownedLiteral xmi:type="uml:EnumerationLiteral" xmi:id="_bk-BookingStatus.CANCELLED" name="CANCELLED"/>
+        </packagedElement>
+        <packagedElement xmi:type="uml:PrimitiveType" xmi:id="_bk-DateTime" name="DateTime"/>
+        <packagedElement xmi:type="uml:DataType" xmi:id="_bk-CreateBookingRequest" name="CreateBookingRequest">
+          <ownedAttribute xmi:type="uml:Property" xmi:id="_bk-CreateBookingRequest.eventId" name="eventId">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Integer"/>
+          </ownedAttribute>
+          <ownedAttribute xmi:type="uml:Property" xmi:id="_bk-CreateBookingRequest.customerEmail" name="customerEmail">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+          </ownedAttribute>
+          <ownedAttribute xmi:type="uml:Property" xmi:id="_bk-CreateBookingRequest.seatLabels" name="seatLabels">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+            <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_bk-CreateBookingRequest.seatLabels.lower" value="1"/>
+            <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_bk-CreateBookingRequest.seatLabels.upper" value="*"/>
+          </ownedAttribute>
+        </packagedElement>
+        <packagedElement xmi:type="uml:DataType" xmi:id="_bk-UpdateBookingStatusRequest" name="UpdateBookingStatusRequest">
+          <ownedAttribute xmi:type="uml:Property" xmi:id="_bk-UpdateBookingStatusRequest.status" name="status" type="_bk-BookingStatus"/>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Class" xmi:id="_bk-BookingService" name="BookingService"/>
+        <packagedElement xmi:type="uml:Class" xmi:id="_bk-BookingRepository" name="BookingRepository"/>
+        <packagedElement xmi:type="uml:Usage" xmi:id="_bk-service-uses-repository" name="BookingService_uses_BookingRepository" client="_bk-BookingService" supplier="_bk-BookingRepository"/>
+        <packagedElement xmi:type="uml:Usage" xmi:id="_bk-repository-uses-booking" name="BookingRepository_uses_Booking" client="_bk-BookingRepository" supplier="_bk-Booking"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Component" xmi:id="_mibncORVEfG9kLpTJft29g" name="booking-db"/>
+      <packagedElement xmi:type="uml:Interface" xmi:id="_m9TlkORVEfG9kLpTJft29g" name="BookingAPI">
+        <ownedOperation xmi:type="uml:Operation" xmi:id="_bk-op-createBooking" name="createBooking">
+          <ownedParameter xmi:type="uml:Parameter" xmi:id="_bk-op-createBooking.body" name="body" type="_bk-CreateBookingRequest"/>
+          <ownedParameter xmi:type="uml:Parameter" xmi:id="_bk-op-createBooking.return" name="return" type="_bk-Booking" direction="return"/>
+        </ownedOperation>
+        <ownedOperation xmi:type="uml:Operation" xmi:id="_bk-op-getBooking" name="getBooking">
+          <ownedParameter xmi:type="uml:Parameter" xmi:id="_bk-op-getBooking.id" name="id">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Integer"/>
+          </ownedParameter>
+          <ownedParameter xmi:type="uml:Parameter" xmi:id="_bk-op-getBooking.return" name="return" type="_bk-Booking" direction="return"/>
+        </ownedOperation>
+        <ownedOperation xmi:type="uml:Operation" xmi:id="_bk-op-updateBookingStatus" name="updateBookingStatus">
+          <ownedParameter xmi:type="uml:Parameter" xmi:id="_bk-op-updateBookingStatus.id" name="id">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Integer"/>
+          </ownedParameter>
+          <ownedParameter xmi:type="uml:Parameter" xmi:id="_bk-op-updateBookingStatus.body" name="body" type="_bk-UpdateBookingStatusRequest"/>
+          <ownedParameter xmi:type="uml:Parameter" xmi:id="_bk-op-updateBookingStatus.return" name="return" type="_bk-Booking" direction="return"/>
+        </ownedOperation>
+        <ownedOperation xmi:type="uml:Operation" xmi:id="_bk-op-releaseHolds" name="releaseHolds">
+          <ownedParameter xmi:type="uml:Parameter" xmi:id="_bk-op-releaseHolds.id" name="id">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Integer"/>
+          </ownedParameter>
+        </ownedOperation>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Usage" xmi:id="_bk-service-uses-db" name="booking-service_uses_booking-db" client="_bh0ZsORVEfG9kLpTJft29g" supplier="_mibncORVEfG9kLpTJft29g"/>
+    </packagedElement>
+    <profileApplication xmi:type="uml:ProfileApplication" xmi:id="_mx0gkORQEfG9kLpTJft29g">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_bk-profileApplication.definition" source="http://www.eclipse.org/uml2/2.0.0/UML">
+        <references xmi:type="ecore:EPackage" href="../MicroservicesProfile/MicroservicesProfile.profile.uml#_tSf2Qd4kEfGkSeqV3pN_Lw"/>
+      </eAnnotations>
+      <appliedProfile xmi:type="uml:Profile" href="../MicroservicesProfile/MicroservicesProfile.profile.uml#_D47iUN3-EfGlcuXNC_n1HQ"/>
+    </profileApplication>
+  </uml:Model>
+  <MicroservicesProfile:ApplicationService xmi:id="_bk-st-booking-service" base_Component="_bh0ZsORVEfG9kLpTJft29g" hostPort="8001" containerPort="8080"/>
+  <MicroservicesProfile:DatabaseService xmi:id="_bk-st-booking-db" base_Component="_mibncORVEfG9kLpTJft29g" hostPort="5433" containerPort="5432" databaseName="bookings" databaseVolume="booking-db-data"/>
+  <MicroservicesProfile:RestAPI xmi:id="_bk-st-BookingAPI" base_Interface="_m9TlkORVEfG9kLpTJft29g" prefix="/bookings"/>
+  <MicroservicesProfile:Route xmi:id="_bk-st-createBooking" base_Operation="_bk-op-createBooking" method="POST" path="/"/>
+  <MicroservicesProfile:Route xmi:id="_bk-st-getBooking" base_Operation="_bk-op-getBooking" method="GET" path="/{id}"/>
+  <MicroservicesProfile:Route xmi:id="_bk-st-updateBookingStatus" base_Operation="_bk-op-updateBookingStatus" method="PATCH" path="/{id}"/>
+  <MicroservicesProfile:Route xmi:id="_bk-st-releaseHolds" base_Operation="_bk-op-releaseHolds" method="DELETE" path="/{id}/holds"/>
+  <MicroservicesProfile:Entity xmi:id="_bk-st-Booking" base_Class="_bk-Booking" table="bookings"/>
+  <MicroservicesProfile:Entity xmi:id="_bk-st-SeatHold" base_Class="_bk-SeatHold" table="seat_holds"/>
+  <MicroservicesProfile:Service xmi:id="_bk-st-BookingService" base_Class="_bk-BookingService"/>
+  <MicroservicesProfile:Repository xmi:id="_bk-st-BookingRepository" base_Class="_bk-BookingRepository"/>
+</xmi:XMI>
