@@ -18,7 +18,6 @@ This document defines how microservice concepts map to UML elements and stereoty
 | MAP-00 | Generic container service | `«ContainerizedService»` | Component | Implemented |
 | MAP-01 | Application service container | `«ApplicationService»` | Component | Implemented |
 | MAP-02 | Database service container | `«DatabaseService»` | Component | Implemented |
-| MAP-03 | REST API contract | `«RestAPI»` | Interface | Implemented |
 | MAP-04 | HTTP endpoint | `«Route»` | Operation | Implemented |
 | MAP-05 | HTTP request method | `HttpMethod` | Enumeration | Implemented |
 | MAP-06 | PostgreSQL table | `«Entity»` | Class | Implemented |
@@ -77,21 +76,6 @@ This document defines how microservice concepts map to UML elements and stereoty
 | Database volume path | `databaseVolume` | String |
 | Internal database port | `containerPort` (default: `5432`) | Integer |
 
-### MAP-03 — REST API Contract
-
-| Property | Specification |
-|---|---|
-| Source element | Public API contract exposed by a FastAPI application |
-| UML metaclass | `Interface` |
-| Applied stereotype | `«RestAPI»` |
-| Mapping rule | Map an API contract to a UML Interface; its endpoint signatures are modeled as operations (MAP-04). |
-
-**Tagged-value mappings**
-
-| Source property | Tagged value | Type |
-|---|---|---|
-| Shared API URL prefix (e.g., `/users`) | `prefix` | String |
-
 ### MAP-04 — HTTP Endpoint
 
 | Property | Specification |
@@ -99,7 +83,7 @@ This document defines how microservice concepts map to UML elements and stereoty
 | Source element | Individual FastAPI HTTP endpoint |
 | UML metaclass | `Operation` |
 | Applied stereotype | `«Route»` |
-| Mapping rule | Map each endpoint to a UML Operation with `«Route»`, including its HTTP method and relative path. |
+| Mapping rule | Map each endpoint to a UML Operation owned by a `«Router»` Class and apply `«Route»`, including its HTTP method and relative path. |
 
 **Tagged-value mappings**
 
@@ -108,7 +92,7 @@ This document defines how microservice concepts map to UML elements and stereoty
 | HTTP method (e.g., GET, POST) | `method` | `HttpMethod` |
 | Endpoint path (e.g., `/{user_id}`) | `path` | String |
 
-*When a shared `«RestAPI».prefix` is used, the effective URL is the prefix plus the endpoint path.*
+*When a shared `«Router».prefix` is used, the effective URL is the prefix plus the endpoint path.*
 
 ### MAP-05 — HTTP Request Method Enumeration
 
@@ -156,9 +140,13 @@ This document defines how microservice concepts map to UML elements and stereoty
 | Source element | FastAPI `APIRouter` |
 | UML metaclass | `Class` |
 | Applied stereotype | `«Router»` |
-| Mapping rule | Represent each modeled router as a UML Class with `«Router»`; relate it to the API interface it implements using `InterfaceRealization`. |
+| Mapping rule | Represent each modeled router as a UML Class with `«Router»`, serving as the main API modeling element and directly owning its endpoint operations (MAP-04). |
 
+**Tagged-value mappings**
 
+| Source property | Tagged value | Type |
+|---|---|---|
+| Shared router URL prefix (e.g., `/users`) | `prefix` | String |
 
 ### MAP-09 — Data-Access Repository
 
@@ -188,25 +176,15 @@ not Dependency relationships.
 | REL-02 | `«ApplicationService»` | `packagedElement` | `«Service»` | Application owns its business services |
 | REL-03 | `«ApplicationService»` | `packagedElement` | `«Repository»` | Application owns its data-access repositories |
 | REL-04 | `«DatabaseService»` | `packagedElement` | `«Entity»` | Database owns its SQL tables |
-| REL-05 | `«RestAPI»` | `ownedOperation` | `«Route»` | API interface owns endpoint declarations |
+| REL-05 | `«Router»` | `ownedOperation` | `«Route»` | Router owns its HTTP endpoint operations |
 | REL-06 | `«Entity»` | `ownedAttribute` | `Property` | Entity owns SQL column definitions |
 | REL-07 | `HttpMethod` | `ownedLiteral` | `EnumerationLiteral` | HTTP enumeration owns its method values |
 
-### 4.2 Interface Realization Relationships
+Each Router belongs to an ApplicationService. An ApplicationService
+exposes the endpoints defined by its owned Routers according to the
+project's transformation rules.
 
-These mappings define which classes implement API contracts.
-
-| ID | Source | UML Relationship | Target | Meaning |
-|---|---|---|---|---|
-| REL-08 | `«Router»` | `InterfaceRealization` | `«RestAPI»` | Router implements the REST API contract |
-
-**Constraint:** Every Router must realize at least one RestAPI
-interface and belong to an ApplicationService.
-
-An ApplicationService exposes the APIs realized by its owned
-Routers according to the project's transformation rules.
-
-### 4.3 Dependency Relationships
+### 4.2 Dependency Relationships
 
 These mappings define usage and runtime dependencies
 between elements.
@@ -225,7 +203,7 @@ between elements.
 - Service-to-Service dependencies are optional.
 - Dependencies do not imply structural ownership.
 
-### 4.4 Association Relationships
+### 4.3 Association Relationships
 
 These mappings define structural relationships between
 database entities.
@@ -240,7 +218,7 @@ database entities.
   referencing and referenced columns.
 - Entities do not have to participate in Associations.
 
-### 4.5 UML Property and Type Mappings
+### 4.4 UML Property and Type Mappings
 
 These mappings use existing UML features rather than
 creating additional stereotypes or dependencies.
@@ -257,7 +235,7 @@ creating additional stereotypes or dependencies.
 - Multiple identifying Properties may form a composite key.
 - SQL column types must have valid PostgreSQL mappings.
 
-### 4.6 Stereotype Generalization
+### 4.5 Stereotype Generalization
 
 These relationships exist in the UML Profile, rather
 than between individual application-model instances.
@@ -284,7 +262,7 @@ Keep all OCL/validation rules here instead of repeating them in every element ma
 
 ## 7. Completion Checklist
 
-- [x] All 10 listed concepts have unique mapping IDs (`MAP-00`–`MAP-09`).
+- [x] All 9 listed concepts have unique mapping IDs.
 - [x] Each mapping records source, UML metaclass, stereotype, and mapping rule.
 - [x] Specified tagged values and HTTP literals are preserved.
 - [x] Existing relationship candidates are collected in one section.
