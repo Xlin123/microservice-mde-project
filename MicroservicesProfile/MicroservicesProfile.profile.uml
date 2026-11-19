@@ -8,6 +8,93 @@
       <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_vKLl5N3-EfGkSeqV3pN_Lw" key="Date" value=""/>
       <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_vKLl5d3-EfGkSeqV3pN_Lw" key="Author" value="&lt;undefined>"/>
     </eAnnotations>
+    <contents xmi:type="ecore:EPackage" xmi:id="_KMHLwORNEfGtPdePy1LCEg" name="MicroservicesProfile" nsURI="http:///schemas/MicroservicesProfile/_KMEvgORNEfGtPdePy1LCEg/4" nsPrefix="MicroservicesProfile">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_KMOggORNEfGtPdePy1LCEg" source="PapyrusVersion">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KMOggeRNEfGtPdePy1LCEg" key="Version" value="0.0.5"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KMOgguRNEfGtPdePy1LCEg" key="Comment" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KMOgg-RNEfGtPdePy1LCEg" key="Copyright" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KMOghORNEfGtPdePy1LCEg" key="Date" value="2026-11-19"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KMOgheRNEfGtPdePy1LCEg" key="Author" value=""/>
+      </eAnnotations>
+      <eClassifiers xmi:type="ecore:EClass" xmi:id="_KMHLweRNEfGtPdePy1LCEg" name="ContainerizedService" abstract="true">
+        <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_KMHLwuRNEfGtPdePy1LCEg" source="http://www.eclipse.org/uml2/2.0.0/UML" references="_HrtQYN3-EfGlcuXNC_n1HQ"/>
+        <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="_KMHLw-RNEfGtPdePy1LCEg" name="hostPort" ordered="false" lowerBound="1">
+          <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/uml2/5.0.0/Types#//Integer"/>
+        </eStructuralFeatures>
+        <eStructuralFeatures xmi:type="ecore:EReference" xmi:id="_KMHLxeRNEfGtPdePy1LCEg" name="base_Component" ordered="false">
+          <eType xmi:type="ecore:EClass" href="http://www.eclipse.org/uml2/5.0.0/UML#//Component"/>
+        </eStructuralFeatures>
+      </eClassifiers>
+      <eClassifiers xmi:type="ecore:EClass" xmi:id="_KMHLx-RNEfGtPdePy1LCEg" name="ApplicationService" eSuperTypes="_KMHLweRNEfGtPdePy1LCEg">
+        <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_KMHLyORNEfGtPdePy1LCEg" source="http://www.eclipse.org/uml2/2.0.0/UML" references="_W1Pl4N3_EfGkSeqV3pN_Lw"/>
+        <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="_KMHLyeRNEfGtPdePy1LCEg" name="containerPort" ordered="false" lowerBound="1" defaultValueLiteral="8080">
+          <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/uml2/5.0.0/Types#//Integer"/>
+        </eStructuralFeatures>
+      </eClassifiers>
+      <eClassifiers xmi:type="ecore:EClass" xmi:id="_KMHLzORNEfGtPdePy1LCEg" name="DatabaseService" eSuperTypes="_KMHLweRNEfGtPdePy1LCEg">
+        <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_KMHLzeRNEfGtPdePy1LCEg" source="http://www.eclipse.org/uml2/2.0.0/UML" references="_M9eIIN4CEfGkSeqV3pN_Lw"/>
+        <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="_KMHLzuRNEfGtPdePy1LCEg" name="databaseName" ordered="false" lowerBound="1">
+          <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/uml2/5.0.0/Types#//String"/>
+        </eStructuralFeatures>
+        <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="_KMHL0ORNEfGtPdePy1LCEg" name="databaseVolume" ordered="false" lowerBound="1">
+          <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/uml2/5.0.0/Types#//String"/>
+        </eStructuralFeatures>
+        <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="_KMHL0uRNEfGtPdePy1LCEg" name="containerPort" ordered="false" lowerBound="1" defaultValueLiteral="5432">
+          <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/uml2/5.0.0/Types#//Integer"/>
+        </eStructuralFeatures>
+      </eClassifiers>
+      <eClassifiers xmi:type="ecore:EClass" xmi:id="_KMHL1eRNEfGtPdePy1LCEg" name="Entity">
+        <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_KMHL1uRNEfGtPdePy1LCEg" source="http://www.eclipse.org/uml2/2.0.0/UML" references="_pvFVgN4GEfGkSeqV3pN_Lw"/>
+        <eStructuralFeatures xmi:type="ecore:EReference" xmi:id="_KMHL1-RNEfGtPdePy1LCEg" name="base_Class" ordered="false">
+          <eType xmi:type="ecore:EClass" href="http://www.eclipse.org/uml2/5.0.0/UML#//Class"/>
+        </eStructuralFeatures>
+      </eClassifiers>
+      <eClassifiers xmi:type="ecore:EClass" xmi:id="_KMHL2eRNEfGtPdePy1LCEg" name="RestAPI">
+        <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_KMHL2uRNEfGtPdePy1LCEg" source="http://www.eclipse.org/uml2/2.0.0/UML" references="_1j0H0N4GEfGkSeqV3pN_Lw"/>
+        <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="_KMHL2-RNEfGtPdePy1LCEg" name="prefix" ordered="false" lowerBound="1">
+          <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/uml2/5.0.0/Types#//String"/>
+        </eStructuralFeatures>
+        <eStructuralFeatures xmi:type="ecore:EReference" xmi:id="_KMHL3eRNEfGtPdePy1LCEg" name="base_Interface" ordered="false">
+          <eType xmi:type="ecore:EClass" href="http://www.eclipse.org/uml2/5.0.0/UML#//Interface"/>
+        </eStructuralFeatures>
+      </eClassifiers>
+      <eClassifiers xmi:type="ecore:EEnum" xmi:id="_KMHL3-RNEfGtPdePy1LCEg" name="HttpMethod">
+        <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_KMHL4ORNEfGtPdePy1LCEg" source="http://www.eclipse.org/uml2/2.0.0/UML" references="_29zZkN4GEfGkSeqV3pN_Lw"/>
+        <eLiterals xmi:type="ecore:EEnumLiteral" xmi:id="_KMHL4eRNEfGtPdePy1LCEg" name="GET"/>
+        <eLiterals xmi:type="ecore:EEnumLiteral" xmi:id="_KMHL4uRNEfGtPdePy1LCEg" name="POST" value="1"/>
+        <eLiterals xmi:type="ecore:EEnumLiteral" xmi:id="_KMHL4-RNEfGtPdePy1LCEg" name="PUT" value="2"/>
+        <eLiterals xmi:type="ecore:EEnumLiteral" xmi:id="_KMHL5ORNEfGtPdePy1LCEg" name="PATCH" value="3"/>
+        <eLiterals xmi:type="ecore:EEnumLiteral" xmi:id="_KMHL5eRNEfGtPdePy1LCEg" name="DELETE" value="4"/>
+      </eClassifiers>
+      <eClassifiers xmi:type="ecore:EClass" xmi:id="_KMHL5uRNEfGtPdePy1LCEg" name="Route">
+        <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_KMHL5-RNEfGtPdePy1LCEg" source="http://www.eclipse.org/uml2/2.0.0/UML" references="_GVk00N4HEfGkSeqV3pN_Lw"/>
+        <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="_KMHL6ORNEfGtPdePy1LCEg" name="method" ordered="false" lowerBound="1" eType="_KMHL3-RNEfGtPdePy1LCEg"/>
+        <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="_KMHL6uRNEfGtPdePy1LCEg" name="path" ordered="false" lowerBound="1">
+          <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/uml2/5.0.0/Types#//String"/>
+        </eStructuralFeatures>
+        <eStructuralFeatures xmi:type="ecore:EReference" xmi:id="_KMHL7ORNEfGtPdePy1LCEg" name="base_Operation" ordered="false">
+          <eType xmi:type="ecore:EClass" href="http://www.eclipse.org/uml2/5.0.0/UML#//Operation"/>
+        </eStructuralFeatures>
+      </eClassifiers>
+      <eClassifiers xmi:type="ecore:EClass" xmi:id="_KMHL7uRNEfGtPdePy1LCEg" name="Service">
+        <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_KMHL7-RNEfGtPdePy1LCEg" source="http://www.eclipse.org/uml2/2.0.0/UML" references="_WhUZ8N4jEfGkSeqV3pN_Lw"/>
+        <eStructuralFeatures xmi:type="ecore:EReference" xmi:id="_KMHL8ORNEfGtPdePy1LCEg" name="base_Class" ordered="false">
+          <eType xmi:type="ecore:EClass" href="http://www.eclipse.org/uml2/5.0.0/UML#//Class"/>
+        </eStructuralFeatures>
+      </eClassifiers>
+      <eClassifiers xmi:type="ecore:EClass" xmi:id="_KMHL8uRNEfGtPdePy1LCEg" name="Repository">
+        <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_KMHL8-RNEfGtPdePy1LCEg" source="http://www.eclipse.org/uml2/2.0.0/UML" references="_qhs_EN4jEfGkSeqV3pN_Lw"/>
+        <eStructuralFeatures xmi:type="ecore:EReference" xmi:id="_KMHL9ORNEfGtPdePy1LCEg" name="base_Class" ordered="false">
+          <eType xmi:type="ecore:EClass" href="http://www.eclipse.org/uml2/5.0.0/UML#//Class"/>
+        </eStructuralFeatures>
+      </eClassifiers>
+      <eClassifiers xmi:type="ecore:EClass" xmi:id="_KMHL9uRNEfGtPdePy1LCEg" name="Router">
+        <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_KMHL9-RNEfGtPdePy1LCEg" source="http://www.eclipse.org/uml2/2.0.0/UML" references="_dxvpQON2EfGtPdePy1LCEg"/>
+        <eStructuralFeatures xmi:type="ecore:EReference" xmi:id="_KMHL-ORNEfGtPdePy1LCEg" name="base_Class" ordered="false">
+          <eType xmi:type="ecore:EClass" href="http://www.eclipse.org/uml2/5.0.0/UML#//Class"/>
+        </eStructuralFeatures>
+      </eClassifiers>
+    </contents>
     <contents xmi:type="ecore:EPackage" xmi:id="_tSf2Qd4kEfGkSeqV3pN_Lw" name="MicroservicesProfile" nsURI="http:///schemas/MicroservicesProfile/_tSf2QN4kEfGkSeqV3pN_Lw/3" nsPrefix="MicroservicesProfile">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_tShEZd4kEfGkSeqV3pN_Lw" source="PapyrusVersion">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tShEZt4kEfGkSeqV3pN_Lw" key="Version" value="0.0.4"/>
@@ -297,9 +384,6 @@
     </ownedAttribute>
   </packagedElement>
   <packagedElement xmi:type="uml:Stereotype" xmi:id="_pvFVgN4GEfGkSeqV3pN_Lw" name="Entity">
-    <ownedAttribute xmi:type="uml:Property" xmi:id="_sG6IgN4GEfGkSeqV3pN_Lw" name="table">
-      <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
-    </ownedAttribute>
     <ownedAttribute xmi:type="uml:Property" xmi:id="_1MGycN4GEfGkSeqV3pN_Lw" name="base_Class" association="_1MChAN4GEfGkSeqV3pN_Lw">
       <type xmi:type="uml:Class" href="pathmap://UML_METAMODELS/UML.metamodel.uml#Class"/>
       <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_1MGycd4GEfGkSeqV3pN_Lw"/>
@@ -357,5 +441,14 @@
   </packagedElement>
   <packagedElement xmi:type="uml:Extension" xmi:id="_xPynsN4jEfGkSeqV3pN_Lw" name="E_Repository_Class22" memberEnd="_xPzOwN4jEfGkSeqV3pN_Lw _xPzOwd4jEfGkSeqV3pN_Lw">
     <ownedEnd xmi:type="uml:ExtensionEnd" xmi:id="_xPzOwN4jEfGkSeqV3pN_Lw" name="extension_Repository" type="_qhs_EN4jEfGkSeqV3pN_Lw" aggregation="composite" association="_xPynsN4jEfGkSeqV3pN_Lw"/>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Stereotype" xmi:id="_dxvpQON2EfGtPdePy1LCEg" name="Router">
+    <ownedAttribute xmi:type="uml:Property" xmi:id="_lZkWQON2EfGtPdePy1LCEg" name="base_Class" association="_lZh6AON2EfGtPdePy1LCEg">
+      <type xmi:type="uml:Class" href="pathmap://UML_METAMODELS/UML.metamodel.uml#Class"/>
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_lZkWQeN2EfGtPdePy1LCEg"/>
+    </ownedAttribute>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Extension" xmi:id="_lZh6AON2EfGtPdePy1LCEg" name="E_Router_Class24" memberEnd="_lZjvMON2EfGtPdePy1LCEg _lZkWQON2EfGtPdePy1LCEg">
+    <ownedEnd xmi:type="uml:ExtensionEnd" xmi:id="_lZjvMON2EfGtPdePy1LCEg" name="extension_Router" type="_dxvpQON2EfGtPdePy1LCEg" aggregation="composite" association="_lZh6AON2EfGtPdePy1LCEg"/>
   </packagedElement>
 </uml:Profile>
