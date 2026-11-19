@@ -1,0 +1,223 @@
+// EVL rules for MicroservicesProfile models.
+//
+// Each rule carries the CON-xx id from documentation/mappings.md, Section 5. Run it with an
+// Epsilon EVL launch configuration whose model is MicroServiceModels/MicroServiceModels.uml,
+// loaded with the UML driver so stereotype applications are visible. See README.md.
+//
+// `constraint` blocks are errors, `critique` blocks are warnings.
+
+// Returns true when the MicroservicesProfile stereotype called `name` is applied to self.
+operation Element hasStereotype(name : String) : Boolean {
+  return self.getAppliedStereotype('MicroservicesProfile::' + name).isDefined();
+}
+
+// Returns the tagged value `name` from whichever applied stereotype declares it, including
+// attributes inherited from ContainerizedService. Returns null when nothing declares it.
+operation Element tag(name : String) : Any {
+  var stereotype = self.getAppliedStereotypes()
+    .selectOne(s | s.getAllAttributes().exists(a | a.name = name));
+  if (stereotype.isUndefined()) {
+    return null;
+  }
+  return self.getValue(stereotype, name);
+}
+
+// Returns true when self is a packagedElement of a Component carrying stereotype `name`.
+operation Element ownedByStereotypedComponent(name : String) : Boolean {
+  return self.owner.isDefined()
+    and self.owner.isKindOf(Component)
+    and self.owner.hasStereotype(name);
+}
+
+// Returns the `{name}` segments of a route path as bare names.
+operation String pathParameters() : Sequence {
+  return self.split('/')
+    .select(s | s.startsWith('{') and s.endsWith('}'))
+    .collect(s | s.substring(1, s.length() - 1));
+}
+
+// CON-01 to CON-05: Router
+context Class {
+  guard: self.hasStereotype('Router')
+
+  constraint RouterOwnedByApplicationService {
+    check: self.ownedByStereotypedComponent('ApplicationService')
+    message: 'CON-01 Router ' + self.name + ' must be owned by an ApplicationService component'
+  }
+
+  constraint RouterPrefixSet {
+    check: self.tag('prefix').isDefined() and self.tag('prefix').startsWith('/')
+    message: 'CON-02 Router ' + self.name + ' needs a prefix starting with /'
+  }
+
+  constraint RouterOperationsAreRoutes {
+    check: self.ownedOperation.forAll(op | op.hasStereotype('Route'))
+    message: 'CON-03 every operation of Router ' + self.name + ' must be a Route'
+  }
+
+  constraint RouteSignaturesUnique {
+    check {
+      var signatures = self.ownedOperation
+        .select(op | op.hasStereotype('Route'))
+        .collect(op | op.tag('method').name + ' ' + op.tag('path'));
+      return signatures.size() = signatures.asSet().size();
+    }
+    message: 'CON-04 Router ' + self.name + ' declares the same method and path twice'
+  }
+
+  critique RouterHasRoutes {
+    check: self.ownedOperation.exists(op | op.hasStereotype('Route'))
+    message: 'CON-05 Router ' + self.name + ' has no Route operations'
+  }
+}
+
+// Returns true when self is an ownedOperation of a Repository class.
+operation Element isRepositoryOperation() : Boolean {
+  return self.isKindOf(Operation)
+    and self.owner.isDefined()
+    and self.owner.isKindOf(Class)
+    and self.owner.hasStereotype('Repository');
+}
+
+// CON-06 to CON-08, CON-21: Route
+context Operation {
+  guard: self.hasStereotype('Route')
+
+  constraint RouteOwnedByRouter {
+    check: self.owner.isDefined()
+      and self.owner.isKindOf(Class)
+      and self.owner.hasStereotype('Router')
+    message: 'CON-06 Route ' + self.name + ' must be owned by a Router class'
+  }
+
+  constraint RouteMethodAndPathSet {
+    check: self.tag('method').isDefined()
+      and self.tag('path').isDefined()
+      and self.tag('path').startsWith('/')
+    message: 'CON-07 Route ' + self.name + ' needs a method and a path starting with /'
+  }
+
+  constraint RoutePathParamsBound {
+    guard: self.tag('path').isDefined()
+    check {
+      var inParams = self.ownedParameter
+        .select(p | p.direction.name = 'in')
+        .collect(p | p.name);
+      return inParams.includesAll(self.tag('path').pathParameters());
+    }
+    message: 'CON-08 Route ' + self.name + ' has path parameters '
+      + self.tag('path').pathParameters().excludingAll(
+          self.ownedParameter.collect(p | p.name))
+      + ' with no matching in-parameter'
+  }
+
+  constraint RouteUsesRepositoryOperation {
+    check: Dependency.all.exists(d | d.client.includes(self)
+      and d.supplier.exists(s | s.isRepositoryOperation()))
+    message: 'CON-21 Route ' + self.name + ' must depend on at least one Repository operation'
+  }
+}
+
+// CON-09, CON-10, CON-20: class roles and ownership
+context Class {
+  constraint ServiceAndRepositoryOwnedByApplicationService {
+    guard: self.hasStereotype('Service') or self.hasStereotype('Repository')
+    check: self.ownedByStereotypedComponent('ApplicationService')
+    message: 'CON-09 ' + self.name + ' must be owned by an ApplicationService component'
+  }
+
+  constraint EntityOwnedByDatabaseService {
+    guard: self.hasStereotype('Entity')
+    check: self.ownedByStereotypedComponent('DatabaseService')
+    message: 'CON-10 Entity ' + self.name + ' must be owned by a DatabaseService component'
+  }
+
+  constraint SingleRole {
+    check: Sequence {'Entity', 'Service', 'Repository', 'Router'}
+      .select(s | self.hasStereotype(s)).size() <= 1
+    message: 'CON-20 ' + self.name + ' may carry only one of Entity, Service, Repository, Router'
+  }
+}
+
+// CON-11, CON-12: Entity columns
+context Class {
+  guard: self.hasStereotype('Entity')
+
+  constraint EntityHasPrimaryKey {
+    check: self.ownedAttribute.exists(a | a.isID)
+    message: 'CON-11 Entity ' + self.name + ' needs at least one attribute with isID = true'
+  }
+
+  constraint EntityColumnsTyped {
+    check: self.ownedAttribute.forAll(a | a.type.isDefined())
+    message: 'CON-12 every attribute of Entity ' + self.name + ' must have a type'
+  }
+}
+
+// CON-13 to CON-16: containers
+context Component {
+  guard: self.hasStereotype('ContainerizedService')
+
+  constraint PortsInRange {
+    check: Sequence {self.tag('hostPort'), self.tag('containerPort')}
+      .forAll(p | p.isDefined() and p >= 1 and p <= 65535)
+    message: 'CON-13 ' + self.name + ' ports must be in 1..65535'
+  }
+
+  constraint HostPortUnique {
+    check: Component.all
+      .select(c | c.hasStereotype('ContainerizedService') and c <> self)
+      .forAll(c | c.tag('hostPort') <> self.tag('hostPort'))
+    message: 'CON-14 ' + self.name + ' publishes a hostPort already used by another service'
+  }
+
+  constraint DatabaseTagsSet {
+    guard: self.hasStereotype('DatabaseService')
+    check: self.tag('databaseName').isDefined() and self.tag('databaseName').length() > 0
+      and self.tag('databaseVolume').isDefined() and self.tag('databaseVolume').length() > 0
+    message: 'CON-15 DatabaseService ' + self.name + ' needs databaseName and databaseVolume'
+  }
+
+  critique ApplicationServiceUsesDatabase {
+    guard: self.hasStereotype('ApplicationService')
+    check: Dependency.all.exists(d | d.client.includes(self)
+      and d.supplier.exists(s | s.hasStereotype('DatabaseService')))
+    message: 'CON-16 ApplicationService ' + self.name + ' does not depend on any DatabaseService'
+  }
+}
+
+// CON-17: dependency allowlist (Usage specialises Dependency, so it is covered too).
+// REL-16 is the one operation-level pair: a Route client and a Repository-owned supplier.
+context Dependency {
+  constraint AllowedDependencyPair {
+    check {
+      var allowed = Sequence {
+        Sequence {'ApplicationService', 'DatabaseService'},
+        Sequence {'Router', 'Service'},
+        Sequence {'Router', 'Repository'},
+        Sequence {'Service', 'Repository'},
+        Sequence {'Service', 'Service'},
+        Sequence {'Repository', 'Entity'}
+      };
+      return self.client.forAll(c | self.supplier.forAll(s |
+        allowed.exists(pair | c.hasStereotype(pair.at(0)) and s.hasStereotype(pair.at(1)))
+        or (c.hasStereotype('Route') and s.isRepositoryOperation())));
+    }
+    message: 'CON-17 Dependency ' + self.name + ' is not a permitted client/supplier pair'
+  }
+}
+
+// CON-18, CON-19: entity associations
+context Association {
+  constraint AssociationBetweenEntities {
+    check: self.memberEnd.forAll(e | e.type.isDefined()
+      and e.type.isKindOf(Class)
+      and e.type.hasStereotype('Entity'))
+    message: 'CON-18 Association ' + self.name + ' must connect two Entity classes'
+  }
+
+  constraint AssociationEndsHaveMultiplicity {
+    check: self.memberEnd.forAll(e | e.lowerValue.isDefined() and e.upperValue.isDefined())
+    message: 'CON-19 Association ' + self.name + ' must give every end an explicit multiplicity'
+  }
+}
