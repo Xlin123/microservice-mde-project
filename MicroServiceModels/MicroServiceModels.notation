@@ -33,42 +33,6 @@
       <element xmi:type="uml:Component" href="MicroServiceModels.uml#_mibncORVEfG9kLpTJft29g"/>
       <layoutConstraint xmi:type="notation:Bounds" xmi:id="_mic1keRVEfG9kLpTJft29g" x="540" y="260"/>
     </children>
-    <children xmi:type="notation:Shape" xmi:id="_m9VawORVEfG9kLpTJft29g" type="Interface_ClassifierShape">
-      <children xmi:type="notation:DecorationNode" xmi:id="_m9VawuRVEfG9kLpTJft29g" type="Interface_ClassifierNameLabel"/>
-      <children xmi:type="notation:DecorationNode" xmi:id="_m9Vaw-RVEfG9kLpTJft29g" type="Interface_ClassifierFloatingNameLabel">
-        <layoutConstraint xmi:type="notation:Location" xmi:id="_m9VaxORVEfG9kLpTJft29g" y="15"/>
-      </children>
-      <children xmi:type="notation:BasicCompartment" xmi:id="_m9VaxeRVEfG9kLpTJft29g" type="Interface_AttributeCompartment">
-        <styles xmi:type="notation:TitleStyle" xmi:id="_m9VaxuRVEfG9kLpTJft29g"/>
-        <styles xmi:type="notation:SortingStyle" xmi:id="_m9Vax-RVEfG9kLpTJft29g"/>
-        <styles xmi:type="notation:FilteringStyle" xmi:id="_m9VayORVEfG9kLpTJft29g"/>
-        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_m9VayeRVEfG9kLpTJft29g"/>
-      </children>
-      <children xmi:type="notation:BasicCompartment" xmi:id="_m9VayuRVEfG9kLpTJft29g" type="Interface_OperationCompartment">
-        <children xmi:type="notation:Shape" xmi:id="_fikncORXEfGbVYzhmrM7Sg" type="Operation_InterfaceOperationLabel">
-          <element xmi:type="uml:Operation" href="MicroServiceModels.uml#_bk-op-createBooking"/>
-          <layoutConstraint xmi:type="notation:Location" xmi:id="_fiknceRXEfGbVYzhmrM7Sg"/>
-        </children>
-        <children xmi:type="notation:Shape" xmi:id="_fikncuRXEfGbVYzhmrM7Sg" type="Operation_InterfaceOperationLabel">
-          <element xmi:type="uml:Operation" href="MicroServiceModels.uml#_bk-op-getBooking"/>
-          <layoutConstraint xmi:type="notation:Location" xmi:id="_fiknc-RXEfGbVYzhmrM7Sg"/>
-        </children>
-        <children xmi:type="notation:Shape" xmi:id="_filOgORXEfGbVYzhmrM7Sg" type="Operation_InterfaceOperationLabel">
-          <element xmi:type="uml:Operation" href="MicroServiceModels.uml#_bk-op-updateBookingStatus"/>
-          <layoutConstraint xmi:type="notation:Location" xmi:id="_filOgeRXEfGbVYzhmrM7Sg"/>
-        </children>
-        <children xmi:type="notation:Shape" xmi:id="_filOguRXEfGbVYzhmrM7Sg" type="Operation_InterfaceOperationLabel">
-          <element xmi:type="uml:Operation" href="MicroServiceModels.uml#_bk-op-releaseHolds"/>
-          <layoutConstraint xmi:type="notation:Location" xmi:id="_filOg-RXEfGbVYzhmrM7Sg"/>
-        </children>
-        <styles xmi:type="notation:TitleStyle" xmi:id="_m9Vay-RVEfG9kLpTJft29g"/>
-        <styles xmi:type="notation:SortingStyle" xmi:id="_m9VazORVEfG9kLpTJft29g"/>
-        <styles xmi:type="notation:FilteringStyle" xmi:id="_m9VazeRVEfG9kLpTJft29g"/>
-        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_m9VazuRVEfG9kLpTJft29g"/>
-      </children>
-      <element xmi:type="uml:Interface" href="MicroServiceModels.uml#_m9TlkORVEfG9kLpTJft29g"/>
-      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_m9VaweRVEfG9kLpTJft29g" x="280" width="181" height="181"/>
-    </children>
     <children xmi:type="notation:Shape" xmi:id="_cMaugORYEfGGDt29Q2iLbA" type="StereotypeComment">
       <styles xmi:type="notation:TitleStyle" xmi:id="_cMaugeRYEfGGDt29Q2iLbA"/>
       <styles xmi:type="notation:EObjectValueStyle" xmi:id="_cMaug-RYEfGGDt29Q2iLbA" name="BASE_ELEMENT">
@@ -84,14 +48,6 @@
       </styles>
       <element xsi:nil="true"/>
       <layoutConstraint xmi:type="notation:Bounds" xmi:id="_cMeY7eRYEfGGDt29Q2iLbA" x="740" y="260"/>
-    </children>
-    <children xmi:type="notation:Shape" xmi:id="_cMfnA-RYEfGGDt29Q2iLbA" type="StereotypeComment">
-      <styles xmi:type="notation:TitleStyle" xmi:id="_cMfnBORYEfGGDt29Q2iLbA"/>
-      <styles xmi:type="notation:EObjectValueStyle" xmi:id="_cMfnBuRYEfGGDt29Q2iLbA" name="BASE_ELEMENT">
-        <eObjectValue xmi:type="uml:Interface" href="MicroServiceModels.uml#_m9TlkORVEfG9kLpTJft29g"/>
-      </styles>
-      <element xsi:nil="true"/>
-      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_cMfnBeRYEfGGDt29Q2iLbA" x="480"/>
     </children>
     <styles xmi:type="notation:StringValueStyle" xmi:id="_SFPxkeRVEfG9kLpTJft29g" name="diagram_compatibility_version" stringValue="1.4.0"/>
     <styles xmi:type="notation:DiagramStyle" xmi:id="_SFPxkuRVEfG9kLpTJft29g"/>
@@ -114,21 +70,6 @@
       <sourceAnchor xmi:type="notation:IdentityAnchor" xmi:id="_PfGj0ORXEfGbVYzhmrM7Sg" id="(1.0,0.5)"/>
       <targetAnchor xmi:type="notation:IdentityAnchor" xmi:id="_PfGj0eRXEfGbVYzhmrM7Sg" id="(0.0,0.5)"/>
     </edges>
-    <edges xmi:type="notation:Connector" xmi:id="_S_PCsORXEfGbVYzhmrM7Sg" type="InterfaceRealization_Edge" source="_bh1n0ORVEfG9kLpTJft29g" target="_m9VawORVEfG9kLpTJft29g">
-      <children xmi:type="notation:DecorationNode" xmi:id="_S_PpwORXEfGbVYzhmrM7Sg" type="InterfaceRealization_NameLabel">
-        <styles xmi:type="notation:BooleanValueStyle" xmi:id="_UOkjoORXEfGbVYzhmrM7Sg" name="IS_UPDATED_POSITION" booleanValue="true"/>
-        <layoutConstraint xmi:type="notation:Location" xmi:id="_S_PpweRXEfGbVYzhmrM7Sg" x="-1" y="60"/>
-      </children>
-      <children xmi:type="notation:DecorationNode" xmi:id="_S_PpwuRXEfGbVYzhmrM7Sg" type="InterfaceRealization_StereotypeLabel">
-        <styles xmi:type="notation:BooleanValueStyle" xmi:id="_UOo1EORXEfGbVYzhmrM7Sg" name="IS_UPDATED_POSITION" booleanValue="true"/>
-        <layoutConstraint xmi:type="notation:Location" xmi:id="_S_Ppw-RXEfGbVYzhmrM7Sg" x="-1" y="30"/>
-      </children>
-      <styles xmi:type="notation:FontStyle" xmi:id="_S_PCseRXEfGbVYzhmrM7Sg"/>
-      <element xmi:type="uml:InterfaceRealization" href="MicroServiceModels.uml#_bk-svc-realises-api"/>
-      <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_S_PCsuRXEfGbVYzhmrM7Sg" points="[402, 260, -643984, -643984]$[500, 187, -643984, -643984]"/>
-      <sourceAnchor xmi:type="notation:IdentityAnchor" xmi:id="_UOviwORXEfGbVYzhmrM7Sg" id="(0.5333333333333333,0.0)"/>
-      <targetAnchor xmi:type="notation:IdentityAnchor" xmi:id="_UOviweRXEfGbVYzhmrM7Sg" id="(0.4419889502762431,1.0)"/>
-    </edges>
     <edges xmi:type="notation:Connector" xmi:id="_cMauhORYEfGGDt29Q2iLbA" type="StereotypeCommentLink" source="_bh1n0ORVEfG9kLpTJft29g" target="_cMaugORYEfGGDt29Q2iLbA">
       <styles xmi:type="notation:FontStyle" xmi:id="_cMauheRYEfGGDt29Q2iLbA"/>
       <styles xmi:type="notation:EObjectValueStyle" xmi:id="_cMbVkORYEfGGDt29Q2iLbA" name="BASE_ELEMENT">
@@ -149,18 +90,50 @@
       <sourceAnchor xmi:type="notation:IdentityAnchor" xmi:id="_cMeY8uRYEfGGDt29Q2iLbA"/>
       <targetAnchor xmi:type="notation:IdentityAnchor" xmi:id="_cMeY8-RYEfGGDt29Q2iLbA"/>
     </edges>
-    <edges xmi:type="notation:Connector" xmi:id="_cMfnB-RYEfGGDt29Q2iLbA" type="StereotypeCommentLink" source="_m9VawORVEfG9kLpTJft29g" target="_cMfnA-RYEfGGDt29Q2iLbA">
-      <styles xmi:type="notation:FontStyle" xmi:id="_cMfnCORYEfGGDt29Q2iLbA"/>
-      <styles xmi:type="notation:EObjectValueStyle" xmi:id="_cMfnDORYEfGGDt29Q2iLbA" name="BASE_ELEMENT">
-        <eObjectValue xmi:type="uml:Interface" href="MicroServiceModels.uml#_m9TlkORVEfG9kLpTJft29g"/>
-      </styles>
-      <element xsi:nil="true"/>
-      <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_cMfnCeRYEfGGDt29Q2iLbA" points="[0, 0, 0, 0]$[0, 0, 0, 0]"/>
-      <sourceAnchor xmi:type="notation:IdentityAnchor" xmi:id="_cMfnCuRYEfGGDt29Q2iLbA"/>
-      <targetAnchor xmi:type="notation:IdentityAnchor" xmi:id="_cMfnC-RYEfGGDt29Q2iLbA"/>
-    </edges>
   </notation:Diagram>
   <notation:Diagram xmi:id="_bkd-diagram" type="PapyrusUMLClassDiagram" name="booking-domain" measurementUnit="Pixel">
+    <children xmi:type="notation:Shape" xmi:id="_bkd-v-BookingAPI" type="Class_Shape">
+      <children xmi:type="notation:DecorationNode" xmi:id="_bkd-api-name" type="Class_NameLabel"/>
+      <children xmi:type="notation:DecorationNode" xmi:id="_bkd-api-floating" type="Class_FloatingNameLabel">
+        <layoutConstraint xmi:type="notation:Location" xmi:id="_bkd-api-floating-loc" y="15"/>
+      </children>
+      <children xmi:type="notation:BasicCompartment" xmi:id="_bkd-api-attrs" type="Class_AttributeCompartment">
+        <styles xmi:type="notation:TitleStyle" xmi:id="_bkd-api-attrs-title"/>
+        <styles xmi:type="notation:SortingStyle" xmi:id="_bkd-api-attrs-sort"/>
+        <styles xmi:type="notation:FilteringStyle" xmi:id="_bkd-api-attrs-filter"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_bkd-api-attrs-bounds"/>
+      </children>
+      <children xmi:type="notation:BasicCompartment" xmi:id="_bkd-api-ops" type="Class_OperationCompartment">
+        <children xmi:type="notation:Shape" xmi:id="_bkd-api-op-createBooking" type="Operation_ClassOperationLabel">
+          <element xmi:type="uml:Operation" href="MicroServiceModels.uml#_bk-op-createBooking"/>
+          <layoutConstraint xmi:type="notation:Location" xmi:id="_bkd-api-op-createBooking-loc"/>
+        </children>
+        <children xmi:type="notation:Shape" xmi:id="_bkd-api-op-getBooking" type="Operation_ClassOperationLabel">
+          <element xmi:type="uml:Operation" href="MicroServiceModels.uml#_bk-op-getBooking"/>
+          <layoutConstraint xmi:type="notation:Location" xmi:id="_bkd-api-op-getBooking-loc"/>
+        </children>
+        <children xmi:type="notation:Shape" xmi:id="_bkd-api-op-updateBookingStatus" type="Operation_ClassOperationLabel">
+          <element xmi:type="uml:Operation" href="MicroServiceModels.uml#_bk-op-updateBookingStatus"/>
+          <layoutConstraint xmi:type="notation:Location" xmi:id="_bkd-api-op-updateBookingStatus-loc"/>
+        </children>
+        <children xmi:type="notation:Shape" xmi:id="_bkd-api-op-releaseHolds" type="Operation_ClassOperationLabel">
+          <element xmi:type="uml:Operation" href="MicroServiceModels.uml#_bk-op-releaseHolds"/>
+          <layoutConstraint xmi:type="notation:Location" xmi:id="_bkd-api-op-releaseHolds-loc"/>
+        </children>
+        <styles xmi:type="notation:TitleStyle" xmi:id="_bkd-api-ops-title"/>
+        <styles xmi:type="notation:SortingStyle" xmi:id="_bkd-api-ops-sort"/>
+        <styles xmi:type="notation:FilteringStyle" xmi:id="_bkd-api-ops-filter"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_bkd-api-ops-bounds"/>
+      </children>
+      <children xmi:type="notation:BasicCompartment" xmi:id="_bkd-api-nested" type="Class_NestedClassifierCompartment">
+        <styles xmi:type="notation:TitleStyle" xmi:id="_bkd-api-nested-title"/>
+        <styles xmi:type="notation:SortingStyle" xmi:id="_bkd-api-nested-sort"/>
+        <styles xmi:type="notation:FilteringStyle" xmi:id="_bkd-api-nested-filter"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_bkd-api-nested-bounds"/>
+      </children>
+      <element xmi:type="uml:Class" href="MicroServiceModels.uml#_m9TlkORVEfG9kLpTJft29g"/>
+      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_bkd-api-bounds" x="40" y="600" width="380" height="150"/>
+    </children>
     <children xmi:type="notation:Shape" xmi:id="_bkd-v-BookingService" type="Class_Shape">
       <children xmi:type="notation:DecorationNode" xmi:id="_bkd-dec-16" type="Class_NameLabel"/>
       <children xmi:type="notation:DecorationNode" xmi:id="_bkd-dec-17" type="Class_FloatingNameLabel">
