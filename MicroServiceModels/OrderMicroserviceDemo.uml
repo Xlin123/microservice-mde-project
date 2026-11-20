@@ -1,50 +1,162 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xmi:XMI xmi:version="20131001" xmlns:xmi="http://www.omg.org/spec/XMI/20131001" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:MicroservicesProfile="http:///schemas/MicroservicesProfile/_KMEvgORNEfGtPdePy1LCEg/4" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmlns:uml="http://www.eclipse.org/uml2/5.0.0/UML" xsi:schemaLocation="http:///schemas/MicroservicesProfile/_KMEvgORNEfGtPdePy1LCEg/4 ../MicroservicesProfile/MicroservicesProfile.profile.uml#_KMHLwORNEfGtPdePy1LCEg">
+<xmi:XMI xmi:version="20131001" xmlns:xmi="http://www.omg.org/spec/XMI/20131001" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:MicroservicesProfile="http:///schemas/MicroservicesProfile/_YeqwwORgEfGGDt29Q2iLbA/5" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmlns:uml="http://www.eclipse.org/uml2/5.0.0/UML" xsi:schemaLocation="http:///schemas/MicroservicesProfile/_YeqwwORgEfGGDt29Q2iLbA/5 ../MicroservicesProfile/MicroservicesProfile.profile.uml#_YerX0ORgEfGGDt29Q2iLbA">
   <uml:Model xmi:id="_S-6BoOROEfGtPdePy1LCEg" name="OrderMicroserviceDemo" visibility="private">
     <packageImport xmi:type="uml:PackageImport" xmi:id="_TJT60OROEfGtPdePy1LCEg">
       <importedPackage xmi:type="uml:Model" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#_0"/>
     </packageImport>
     <packagedElement xmi:type="uml:Component" xmi:id="_3jCbAORQEfGtPdePy1LCEg" name="OrderDatabase">
-      <packagedElement xmi:type="uml:Class" xmi:id="_--6hQORREfGtPdePy1LCEg" name="Order"/>
-      <packagedElement xmi:type="uml:Class" xmi:id="_BZBMMORSEfGtPdePy1LCEg" name="Customer"/>
+      <packagedElement xmi:type="uml:Class" xmi:id="_--6hQORREfGtPdePy1LCEg" name="Order">
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_KAjQYOUbEfGicI0OkJ6D7g" name="id" isID="true">
+          <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Integer"/>
+        </ownedAttribute>
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_gSLfYOUbEfGicI0OkJ6D7g" name="name">
+          <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+        </ownedAttribute>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="_BZBMMORSEfGtPdePy1LCEg" name="Customer">
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_mTqgsOUbEfGicI0OkJ6D7g" name="id" isID="true">
+          <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Integer"/>
+        </ownedAttribute>
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_uzDu4OUbEfGicI0OkJ6D7g" name="total">
+          <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Real"/>
+        </ownedAttribute>
+      </packagedElement>
     </packagedElement>
     <packagedElement xmi:type="uml:Component" xmi:id="_qBzDkORQEfGtPdePy1LCEg" name="OrderApplication">
-      <packagedElement xmi:type="uml:Class" xmi:id="_nbY2cORaEfGtPdePy1LCEg" name="OrderRouter"/>
-      <packagedElement xmi:type="uml:Class" xmi:id="_wlKeYORaEfGtPdePy1LCEg" name="CustomerRouter"/>
-      <packagedElement xmi:type="uml:Class" xmi:id="_1lxRgORaEfGtPdePy1LCEg" name="OrderRepostory"/>
-      <packagedElement xmi:type="uml:Class" xmi:id="_3gX9AORaEfGtPdePy1LCEg" name="CustomerRepository"/>
-      <packagedElement xmi:type="uml:Class" xmi:id="_5W4LoORaEfGtPdePy1LCEg" name="OrderService"/>
-      <packagedElement xmi:type="uml:Class" xmi:id="_6tMeUORaEfGtPdePy1LCEg" name="PaymentService"/>
+      <packagedElement xmi:type="uml:Class" xmi:id="_nbY2cORaEfGtPdePy1LCEg" name="OrderRouter" visibility="public">
+        <ownedOperation xmi:type="uml:Operation" xmi:id="_iIJcIOUTEfGicI0OkJ6D7g" name="get_order" visibility="public">
+          <ownedParameter xmi:type="uml:Parameter" xmi:id="_vHoxYOUTEfGicI0OkJ6D7g" name="order_id">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Integer"/>
+          </ownedParameter>
+          <ownedParameter xmi:type="uml:Parameter" xmi:id="_yTcmEOUTEfGicI0OkJ6D7g" name="order" type="_--6hQORREfGtPdePy1LCEg" direction="return">
+            <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_uzWG8OUUEfGicI0OkJ6D7g" name="LiteralInteger1"/>
+            <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_uzcNkOUUEfGicI0OkJ6D7g" name="LiteralUnlimitedNatural1" value="1"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:type="uml:Operation" xmi:id="_4nyR8OUTEfGicI0OkJ6D7g" name="create_order">
+          <ownedParameter xmi:type="uml:Parameter" xmi:id="_GeimYOUUEfGicI0OkJ6D7g" name="customer_id">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Integer"/>
+          </ownedParameter>
+          <ownedParameter xmi:type="uml:Parameter" xmi:id="_LINgMOUUEfGicI0OkJ6D7g" name="total">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Real"/>
+            <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_PYvhQOUUEfGicI0OkJ6D7g" name="LiteralInteger1" value="1"/>
+            <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_PYwvYOUUEfGicI0OkJ6D7g" name="LiteralUnlimitedNatural1" value="1"/>
+          </ownedParameter>
+          <ownedParameter xmi:type="uml:Parameter" xmi:id="_PwtVUOUUEfGicI0OkJ6D7g" name="result" type="_--6hQORREfGtPdePy1LCEg" direction="return">
+            <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_vnSacOUWEfGicI0OkJ6D7g" name="LiteralInteger1" value="1"/>
+            <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_vnXS8OUWEfGicI0OkJ6D7g" name="LiteralUnlimitedNatural1" value="1"/>
+          </ownedParameter>
+        </ownedOperation>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="_wlKeYORaEfGtPdePy1LCEg" name="CustomerRouter">
+        <ownedOperation xmi:type="uml:Operation" xmi:id="_gYwssOUUEfGicI0OkJ6D7g" name="get_customer" visibility="public">
+          <ownedParameter xmi:type="uml:Parameter" xmi:id="_mMb7gOUUEfGicI0OkJ6D7g" name="customer_id">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Integer"/>
+          </ownedParameter>
+          <ownedParameter xmi:type="uml:Parameter" xmi:id="_ozJfEOUUEfGicI0OkJ6D7g" name="result" type="_BZBMMORSEfGtPdePy1LCEg" direction="return">
+            <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_szDDIOUUEfGicI0OkJ6D7g" name="LiteralInteger1"/>
+            <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_szDqMOUUEfGicI0OkJ6D7g" name="LiteralUnlimitedNatural1" value="1"/>
+          </ownedParameter>
+        </ownedOperation>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="_1lxRgORaEfGtPdePy1LCEg" name="OrderRepostory">
+        <ownedOperation xmi:type="uml:Operation" xmi:id="_DBWmcOUXEfGicI0OkJ6D7g" name="find_order" visibility="public">
+          <ownedParameter xmi:type="uml:Parameter" xmi:id="_WM7DcOUXEfGicI0OkJ6D7g" name="order_id">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Integer"/>
+          </ownedParameter>
+          <ownedParameter xmi:type="uml:Parameter" xmi:id="_Y7KLUOUXEfGicI0OkJ6D7g" name="result" type="_--6hQORREfGtPdePy1LCEg" direction="return">
+            <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_ad-B4OUXEfGicI0OkJ6D7g" name="LiteralInteger1"/>
+            <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_ad-o8OUXEfGicI0OkJ6D7g" name="LiteralUnlimitedNatural1" value="1"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:type="uml:Operation" xmi:id="_c1i9QOUXEfGicI0OkJ6D7g" name="save_order" visibility="public">
+          <ownedParameter xmi:type="uml:Parameter" xmi:id="_eZ-kcOUXEfGicI0OkJ6D7g" name="customer_id">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Integer"/>
+          </ownedParameter>
+          <ownedParameter xmi:type="uml:Parameter" xmi:id="_h_1Q0OUXEfGicI0OkJ6D7g" name="result" type="_--6hQORREfGtPdePy1LCEg" direction="return">
+            <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_jrx1QOUXEfGicI0OkJ6D7g" name="LiteralInteger1" value="1"/>
+            <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_jrycUOUXEfGicI0OkJ6D7g" name="LiteralUnlimitedNatural1" value="1"/>
+          </ownedParameter>
+        </ownedOperation>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="_3gX9AORaEfGtPdePy1LCEg" name="CustomerRepository">
+        <ownedOperation xmi:type="uml:Operation" xmi:id="_6hsAkOUYEfGicI0OkJ6D7g" name="find_customer">
+          <ownedParameter xmi:type="uml:Parameter" xmi:id="_-CTnoOUYEfGicI0OkJ6D7g" name="customer_id">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Integer"/>
+          </ownedParameter>
+          <ownedParameter xmi:type="uml:Parameter" xmi:id="_ARkUgOUZEfGicI0OkJ6D7g" name="result" type="_BZBMMORSEfGtPdePy1LCEg" direction="return">
+            <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_CNE-8OUZEfGicI0OkJ6D7g" name="LiteralInteger1"/>
+            <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_CNFmAOUZEfGicI0OkJ6D7g" name="LiteralUnlimitedNatural1" value="1"/>
+          </ownedParameter>
+        </ownedOperation>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="_5W4LoORaEfGtPdePy1LCEg" name="OrderService">
+        <ownedOperation xmi:type="uml:Operation" xmi:id="_T0dMsOUWEfGicI0OkJ6D7g" name="get_order">
+          <ownedParameter xmi:type="uml:Parameter" xmi:id="_V3Fy0OUWEfGicI0OkJ6D7g" name="order_id">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Integer"/>
+          </ownedParameter>
+          <ownedParameter xmi:type="uml:Parameter" xmi:id="_q6NnUOUWEfGicI0OkJ6D7g" name="result" type="_--6hQORREfGtPdePy1LCEg">
+            <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_uOmJMOUWEfGicI0OkJ6D7g" name="LiteralInteger1"/>
+            <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_uOnXUOUWEfGicI0OkJ6D7g" name="LiteralUnlimitedNatural1" value="1"/>
+          </ownedParameter>
+        </ownedOperation>
+        <ownedOperation xmi:type="uml:Operation" xmi:id="_yUWdoOUWEfGicI0OkJ6D7g" name="create_order" visibility="public">
+          <ownedParameter xmi:type="uml:Parameter" xmi:id="_0XcWwOUWEfGicI0OkJ6D7g" name="customer_id">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Integer"/>
+          </ownedParameter>
+          <ownedParameter xmi:type="uml:Parameter" xmi:id="_3xpz0OUWEfGicI0OkJ6D7g" name="result" type="_--6hQORREfGtPdePy1LCEg" direction="return"/>
+        </ownedOperation>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="_6tMeUORaEfGtPdePy1LCEg" name="PricingService">
+        <ownedOperation xmi:type="uml:Operation" xmi:id="_FXnIoOUWEfGicI0OkJ6D7g" name="calculate_total">
+          <ownedParameter xmi:type="uml:Parameter" xmi:id="_HVB3kOUWEfGicI0OkJ6D7g" name="total">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Real"/>
+          </ownedParameter>
+          <ownedParameter xmi:type="uml:Parameter" xmi:id="_JAzc4OUWEfGicI0OkJ6D7g" name="result" direction="return">
+            <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Real"/>
+          </ownedParameter>
+        </ownedOperation>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Dependency" xmi:id="_OzTHUOUTEfGicI0OkJ6D7g" client="_qBzDkORQEfGtPdePy1LCEg" supplier="_3jCbAORQEfGtPdePy1LCEg"/>
     </packagedElement>
-    <packagedElement xmi:type="uml:Interface" xmi:id="_RILzwORSEfGtPdePy1LCEg" name="OrderAPI">
-      <ownedOperation xmi:type="uml:Operation" xmi:id="_qwGTAORbEfGtPdePy1LCEg" name="getOrder" visibility="package">
-        <ownedParameter xmi:type="uml:Parameter" xmi:id="_0Dz6EORbEfGtPdePy1LCEg" name="id">
-          <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Integer"/>
-        </ownedParameter>
-        <ownedParameter xmi:type="uml:Parameter" xmi:id="_O4Mo8ORkEfGtPdePy1LCEg" name="name">
-          <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
-        </ownedParameter>
-      </ownedOperation>
+    <packagedElement xmi:type="uml:Dependency" xmi:id="_JnbQoOUZEfGicI0OkJ6D7g" client="_nbY2cORaEfGtPdePy1LCEg" supplier="_5W4LoORaEfGtPdePy1LCEg"/>
+    <packagedElement xmi:type="uml:Dependency" xmi:id="_LsdqgOUZEfGicI0OkJ6D7g" client="_5W4LoORaEfGtPdePy1LCEg" supplier="_S-6BoOROEfGtPdePy1LCEg"/>
+    <packagedElement xmi:type="uml:Dependency" xmi:id="_MuP3oOUZEfGicI0OkJ6D7g" client="_5W4LoORaEfGtPdePy1LCEg" supplier="_1lxRgORaEfGtPdePy1LCEg"/>
+    <packagedElement xmi:type="uml:Dependency" xmi:id="_VCTYgOUZEfGicI0OkJ6D7g" client="_wlKeYORaEfGtPdePy1LCEg" supplier="_3gX9AORaEfGtPdePy1LCEg"/>
+    <packagedElement xmi:type="uml:Dependency" xmi:id="_eOFyoOUZEfGicI0OkJ6D7g" client="_1lxRgORaEfGtPdePy1LCEg" supplier="_--6hQORREfGtPdePy1LCEg"/>
+    <packagedElement xmi:type="uml:Dependency" xmi:id="_f0IjYOUZEfGicI0OkJ6D7g" client="_3gX9AORaEfGtPdePy1LCEg" supplier="_BZBMMORSEfGtPdePy1LCEg"/>
+    <packagedElement xmi:type="uml:Dependency" xmi:id="_xB0h8OUaEfGicI0OkJ6D7g" client="_iIJcIOUTEfGicI0OkJ6D7g" supplier="_T0dMsOUWEfGicI0OkJ6D7g"/>
+    <packagedElement xmi:type="uml:Dependency" xmi:id="_x2PBcOUaEfGicI0OkJ6D7g" client="_T0dMsOUWEfGicI0OkJ6D7g" supplier="_DBWmcOUXEfGicI0OkJ6D7g"/>
+    <packagedElement xmi:type="uml:Dependency" xmi:id="_2_mvAOUaEfGicI0OkJ6D7g" client="_4nyR8OUTEfGicI0OkJ6D7g" supplier="_yUWdoOUWEfGicI0OkJ6D7g"/>
+    <packagedElement xmi:type="uml:Dependency" xmi:id="_4bFOgOUaEfGicI0OkJ6D7g" client="_yUWdoOUWEfGicI0OkJ6D7g" supplier="_c1i9QOUXEfGicI0OkJ6D7g"/>
+    <packagedElement xmi:type="uml:Dependency" xmi:id="_6DmEcOUaEfGicI0OkJ6D7g" client="_yUWdoOUWEfGicI0OkJ6D7g" supplier="_FXnIoOUWEfGicI0OkJ6D7g"/>
+    <packagedElement xmi:type="uml:Dependency" xmi:id="_E3vjgOUbEfGicI0OkJ6D7g" client="_gYwssOUUEfGicI0OkJ6D7g" supplier="_6hsAkOUYEfGicI0OkJ6D7g"/>
+    <packagedElement xmi:type="uml:Association" xmi:id="_zl2IcOUbEfGicI0OkJ6D7g" memberEnd="_zl7oAOUbEfGicI0OkJ6D7g _zl-EQOUbEfGicI0OkJ6D7g">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_zl5y0OUbEfGicI0OkJ6D7g" source="org.eclipse.papyrus">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_zl6Z4OUbEfGicI0OkJ6D7g" key="nature" value="UML_Nature"/>
+      </eAnnotations>
+      <ownedEnd xmi:type="uml:Property" xmi:id="_zl7oAOUbEfGicI0OkJ6D7g" name="customer" type="_BZBMMORSEfGtPdePy1LCEg" association="_zl2IcOUbEfGicI0OkJ6D7g"/>
+      <ownedEnd xmi:type="uml:Property" xmi:id="_zl-EQOUbEfGicI0OkJ6D7g" name="order" type="_--6hQORREfGtPdePy1LCEg" association="_zl2IcOUbEfGicI0OkJ6D7g"/>
     </packagedElement>
-    <packagedElement xmi:type="uml:Interface" xmi:id="_oku9wORSEfGtPdePy1LCEg" name="CustomerAPI"/>
+    <packagedElement xmi:type="uml:AssociationClass" xmi:id="_9WxP8OUbEfGicI0OkJ6D7g"/>
     <profileApplication xmi:type="uml:ProfileApplication" xmi:id="_LyfBwORPEfGtPdePy1LCEg">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_LyfBweRPEfGtPdePy1LCEg" source="http://www.eclipse.org/uml2/2.0.0/UML">
-        <references xmi:type="ecore:EPackage" href="../MicroservicesProfile/MicroservicesProfile.profile.uml#_KMHLwORNEfGtPdePy1LCEg"/>
+        <references xmi:type="ecore:EPackage" href="../MicroservicesProfile/MicroservicesProfile.profile.uml#_YerX0ORgEfGGDt29Q2iLbA"/>
       </eAnnotations>
       <appliedProfile xmi:type="uml:Profile" href="../MicroservicesProfile/MicroservicesProfile.profile.uml#_D47iUN3-EfGlcuXNC_n1HQ"/>
     </profileApplication>
   </uml:Model>
   <MicroservicesProfile:ApplicationService xmi:id="_1yWggORQEfGtPdePy1LCEg" base_Component="_qBzDkORQEfGtPdePy1LCEg"/>
-  <MicroservicesProfile:DatabaseService xmi:id="_6J69sORQEfGtPdePy1LCEg" base_Component="_3jCbAORQEfGtPdePy1LCEg"/>
+  <MicroservicesProfile:DatabaseService xmi:id="_6J69sORQEfGtPdePy1LCEg" hostPort="5433" base_Component="_3jCbAORQEfGtPdePy1LCEg" databaseName="orders_db" databaseVolume="orders_pgdata"/>
   <MicroservicesProfile:Entity xmi:id="_AmBpAORSEfGtPdePy1LCEg" base_Class="_--6hQORREfGtPdePy1LCEg"/>
   <MicroservicesProfile:Entity xmi:id="_Cjbw4ORSEfGtPdePy1LCEg" base_Class="_BZBMMORSEfGtPdePy1LCEg"/>
-  <MicroservicesProfile:RestAPI xmi:id="_VTxDYORSEfGtPdePy1LCEg" prefix="/orders" base_Interface="_RILzwORSEfGtPdePy1LCEg"/>
-  <MicroservicesProfile:RestAPI xmi:id="_qs9OgORSEfGtPdePy1LCEg" base_Interface="_oku9wORSEfGtPdePy1LCEg"/>
-  <MicroservicesProfile:Router xmi:id="_qTnAwORaEfGtPdePy1LCEg" base_Class="_nbY2cORaEfGtPdePy1LCEg"/>
-  <MicroservicesProfile:Router xmi:id="_0n1CkORaEfGtPdePy1LCEg" base_Class="_wlKeYORaEfGtPdePy1LCEg"/>
+  <MicroservicesProfile:Router xmi:id="_qTnAwORaEfGtPdePy1LCEg" base_Class="_nbY2cORaEfGtPdePy1LCEg" prefix="/orders"/>
+  <MicroservicesProfile:Router xmi:id="_0n1CkORaEfGtPdePy1LCEg" base_Class="_wlKeYORaEfGtPdePy1LCEg" prefix="/customers"/>
   <MicroservicesProfile:Repository xmi:id="_9I_yYORaEfGtPdePy1LCEg" base_Class="_1lxRgORaEfGtPdePy1LCEg"/>
   <MicroservicesProfile:Repository xmi:id="_-5-n0ORaEfGtPdePy1LCEg" base_Class="_3gX9AORaEfGtPdePy1LCEg"/>
   <MicroservicesProfile:Service xmi:id="_A34e8ORbEfGtPdePy1LCEg" base_Class="_5W4LoORaEfGtPdePy1LCEg"/>
   <MicroservicesProfile:Service xmi:id="_CdiOIORbEfGtPdePy1LCEg" base_Class="_6tMeUORaEfGtPdePy1LCEg"/>
-  <MicroservicesProfile:Route xmi:id="_C_zYQORcEfGtPdePy1LCEg" path="/{orderId}" base_Operation="_qwGTAORbEfGtPdePy1LCEg"/>
+  <MicroservicesProfile:Route xmi:id="_nIvoMOUTEfGicI0OkJ6D7g" path="/{order_id}" base_Operation="_iIJcIOUTEfGicI0OkJ6D7g"/>
+  <MicroservicesProfile:Route xmi:id="_7A3CIOUTEfGicI0OkJ6D7g" method="POST" path="/" base_Operation="_4nyR8OUTEfGicI0OkJ6D7g"/>
+  <MicroservicesProfile:Route xmi:id="_iGCt4OUUEfGicI0OkJ6D7g" path="/{customer_id}" base_Operation="_gYwssOUUEfGicI0OkJ6D7g"/>
 </xmi:XMI>
