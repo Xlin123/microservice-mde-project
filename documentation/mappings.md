@@ -2,6 +2,42 @@
 
 This document defines how microservice concepts map to UML elements and stereotypes, as well as the UML relationships used between them. It documents the **modeling rules**; it does not imply that code generation or EVL validation is already implemented.
 
+## Table of Contents
+
+- [1. Project Information](#1-project-information)
+- [2. Mapping Summary](#2-mapping-summary)
+- [3. Individual Mapping Rules](#3-individual-mapping-rules)
+  - [MAP-00 — Generic Container Service](#map-00--generic-container-service)
+  - [MAP-01 — Application Service Container](#map-01--application-service-container)
+  - [MAP-02 — Database Service Container](#map-02--database-service-container)
+  - [MAP-04 — HTTP Endpoint](#map-04--http-endpoint)
+  - [MAP-05 — HTTP Request Method Enumeration](#map-05--http-request-method-enumeration)
+  - [MAP-06 — PostgreSQL Table](#map-06--postgresql-table)
+  - [MAP-07 — Business Service Module](#map-07--business-service-module)
+  - [MAP-08 — FastAPI Router](#map-08--fastapi-router)
+  - [MAP-09 — Data-Access Repository](#map-09--data-access-repository)
+- [4. Relationship Mappings](#4-relationship-mappings)
+  - [4.1 Structural Ownership Relationships](#41-structural-ownership-relationships)
+  - [4.2 Dependency Relationships](#42-dependency-relationships)
+  - [4.3 Association Relationships](#43-association-relationships)
+  - [4.4 UML Property and Type Mappings](#44-uml-property-and-type-mappings)
+  - [4.5 Stereotype Generalization](#45-stereotype-generalization)
+  - [4.6 UML Primitive Types to Python and PostgreSQL](#46-uml-primitive-types-to-python-and-postgresql)
+  - [4.7 SQL Mappings for Entity Associations and Keys](#47-sql-mappings-for-entity-associations-and-keys)
+- [5. Constraints and Validation](#5-constraints-and-validation)
+  - [5.1 EVL Implementation](#51-evl-implementation)
+  - [5.2 Route Call Chains and Isolated Router Scopes](#52-route-call-chains-and-isolated-router-scopes-con-21-con-24-to-con-27)
+  - [5.3 Router and Service Dependencies Match Method Calls](#53-router-and-service-dependencies-match-method-calls-con-22-con-23)
+  - [5.4 Repository Access Matches Application Database Dependencies](#54-repository-access-matches-application-database-dependencies-con-28)
+  - [5.5 Application Routes Have Unique Full URL Patterns](#55-application-routes-have-unique-full-url-patterns-con-29)
+  - [5.6 Required, Unique and Usable Names](#56-required-unique-and-usable-names-con-30-to-con-32)
+  - [5.7 Application and Database Container Roles Are Exclusive](#57-application-and-database-container-roles-are-exclusive-con-33)
+  - [5.8 Router Prefixes, Route Paths and Path Parameters](#58-router-prefixes-route-paths-and-path-parameters-con-02-con-07-con-08-con-34-to-con-39)
+  - [5.9 Single-Column Primary Keys and Association Consistency](#59-single-column-primary-keys-and-association-consistency-con-11-con-12-con-18-con-19-con-40-to-con-48)
+  - [5.10 Method Signatures, Returns and Declared Usage](#510-method-signatures-returns-and-declared-usage-con-49-to-con-55)
+- [6. Open Modeling Decisions](#6-open-modeling-decisions)
+- [7. Completion Checklist](#7-completion-checklist)
+
 ## 1. Project Information
 
 | Property | Value |
