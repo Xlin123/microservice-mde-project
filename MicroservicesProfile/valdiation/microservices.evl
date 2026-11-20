@@ -1,0 +1,683 @@
+// Validates CON-01 through CON-55 in documentation/mappings.md.
+// Load the application with Epsilon's UML driver. Validation never stores the model.
+// Helpers include stereotype inheritance and exclude profile/library definitions.
+// SQL name comparison follows quoted, case-preserving identifiers with PostgreSQL's
+// standard 63-byte UTF-8 limit. Generation-policy decisions remain documented separately.
+
+@cached
+operation Any roleNames() : Set {
+  var names = new Set;
+  if (self.isUndefined() or not self.isKindOf(Element) or self.eIsProxy()) { return names; }
+  for (role in self.getAppliedStereotypes()) {
+    names.add(role.qualifiedName);
+    names.addAll(role.allParents().collect(parent | parent.qualifiedName));
+  }
+  return names;
+}
+operation Any hasRole(name : String) : Boolean {
+  return self.roleNames().includes('MicroservicesProfile::' + name);
+}
+@cached
+operation Element isApplicationElement() : Boolean {
+  var ancestor = self;
+  while (ancestor.isDefined()) {
+    if (ancestor.isKindOf(Profile)) { return false; }
+    ancestor = ancestor.owner;
+  }
+  var resource = self.eResource();
+  if (resource.isUndefined()) { return false; }
+  var resources = resource.getResourceSet();
+  if (resources.isUndefined()) { return false; }
+  // Compare canonical resource identity, not filenames chosen by the modeler.
+  return not Sequence {'pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml',
+    'pathmap://UML_METAMODELS/UML.metamodel.uml'}.exists(uri |
+      resources.getResource(Native('org.eclipse.emf.common.util.URI').createURI(uri), false) = resource);
+}
+operation Element tag(name : String) : Any {
+  var role = self.getAppliedStereotypes().selectOne(s | s.getAllAttributes().exists(a | a.name = name));
+  if (role.isUndefined()) { return null; }
+  return self.getValue(role, name);
+}
+operation Any isClassOf(role : String) : Boolean {
+  return self.isDefined() and self.isKindOf(Class) and self.hasRole(role);
+}
+operation Any isOperationOf(role : String) : Boolean {
+  if (self.isUndefined() or not self.isKindOf(Operation)) { return false; }
+  return self.owner.isClassOf(role) and self.owner.ownedOperation.includes(self);
+}
+@cached
+operation Any isRoute() : Boolean {
+  return self.isDefined() and self.isKindOf(Operation) and self.hasRole('Route');
+}
+@cached
+operation Any isMethod() : Boolean {
+  return self.isOperationOf('Router') or self.isOperationOf('Service') or self.isOperationOf('Repository');
+}
+operation Element ownedBy(role : String) : Boolean {
+  return self.owner.isDefined() and self.owner.isKindOf(Component)
+    and self.owner.hasRole(role) and self.owner.packagedElement.includes(self);
+}
+@cached
+operation dependencies() : Sequence {
+  return Dependency.all.select(d | d.isApplicationElement()).asSequence();
+}
+@cached
+operation routers() : Sequence {
+  return Class.all.select(c | c.isApplicationElement() and c.hasRole('Router')).asSequence();
+}
+operation Element dependsOn(target : Element) : Boolean {
+  return dependencies().exists(d | d.client.includes(self) and d.supplier.includes(target));
+}
+operation Any allowedMethodCall(target : Any) : Boolean {
+  return ((self.isRoute() and self.isOperationOf('Router')) or self.isOperationOf('Service'))
+    and (target.isOperationOf('Service') or target.isOperationOf('Repository'));
+}
+operation Any allowedDependency(target : Any) : Boolean {
+  if (self.isKindOf(Operation) or target.isKindOf(Operation)) { return self.allowedMethodCall(target); }
+  return (self.hasRole('ApplicationService') and target.hasRole('DatabaseService'))
+    or (self.isClassOf('Router') and (target.isClassOf('Service') or target.isClassOf('Repository')))
+    or (self.isClassOf('Service') and (target.isClassOf('Service') or target.isClassOf('Repository')))
+    or (self.isClassOf('Repository') and target.isClassOf('Entity'));
+}
+// Follow every service branch; a visited set makes cycles and shared utilities safe.
+@cached
+operation Class routerScope() : Set {
+  var visited = new Set;
+  var pending = Sequence {self};
+  while (not pending.isEmpty()) {
+    var current = pending.removeAt(0);
+    if (not visited.includes(current)) {
+      visited.add(current);
+      if (current = self or current.isClassOf('Service')) {
+        for (d in dependencies().select(d | d.client.includes(current))) {
+          pending.addAll(d.supplier.select(s | s.isClassOf('Service') or s.isClassOf('Repository')));
+        }
+      }
+    }
+  }
+  return visited;
+}
+@cached
+operation Operation reachedRepositories() : Set {
+  var visited = new Set;
+  var repositories = new Set;
+  var pending = Sequence {self};
+  while (not pending.isEmpty()) {
+    var current = pending.removeAt(0);
+    if (not visited.includes(current)) {
+      visited.add(current);
+      if (current.isOperationOf('Repository')) { repositories.add(current.owner); }
+      else {
+        for (d in dependencies().select(d | d.client.includes(current))) {
+          pending.addAll(d.supplier.select(s | s.isOperationOf('Service') or s.isOperationOf('Repository')));
+        }
+      }
+    }
+  }
+  return repositories;
+}
+@cached
+operation Any primitiveName() : String {
+  if (self.isUndefined() or not self.isKindOf(PrimitiveType) or self.eIsProxy()) { return ''; }
+  var resource = self.eResource();
+  if (resource.isUndefined()) { return ''; }
+  var canonical = resource.getResourceSet().getEObject(
+    Native('org.eclipse.emf.common.util.URI').createURI(
+      'pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#' + self.name), true);
+  if (canonical <> self) { return ''; }
+  return self.name;
+}
+operation Any isScalarType() : Boolean {
+  return Sequence {'String', 'Integer', 'Boolean', 'Real'}.includes(self.primitiveName());
+}
+operation Any isKeyType() : Boolean { return Sequence {'Integer', 'String'}.includes(self.primitiveName()); }
+operation Any isParameterType() : Boolean {
+  if (self.isUndefined() or self.eIsProxy()) { return false; }
+  return self.isScalarType() or self.isClassOf('Entity');
+}
+operation MultiplicityElement isMultiplicity(lower : Integer, upper : Integer) : Boolean {
+  return self.lower = lower and self.upper = upper;
+}
+operation MultiplicityElement isScalarMultiplicity() : Boolean {
+  return self.isMultiplicity(1, 1) or self.isMultiplicity(0, 1);
+}
+operation Class scalarAttributes() : Sequence {
+  return self.ownedAttribute.select(a | a.association.isUndefined()).asSequence();
+}
+operation Class keys() : Sequence { return self.scalarAttributes().select(a | a.isID); }
+operation Class hasValidKey() : Boolean {
+  var keys = self.keys();
+  return keys.size() = 1 and keys.forAll(k | k.isMultiplicity(1, 1) and k.type.isKeyType())
+    and self.ownedAttribute.select(a | a.isID).size() = 1;
+}
+operation Any cleanName() : Boolean {
+  return self.isDefined() and self.isKindOf(String) and self.length() > 0 and self.trim() = self
+    and not self.matches('(?s)([\\p{Z}\\p{Cc}].*|.*[\\p{Z}\\p{Cc}])');
+}
+operation String pythonName() : String {
+  return Native('java.text.Normalizer').normalize(self, Native('java.text.Normalizer$Form').NFKC);
+}
+operation Any pythonIdentifier() : Boolean {
+  if (not self.cleanName()) { return false; }
+  if (Sequence {'False', 'None', 'True', 'and', 'as', 'assert', 'async', 'await',
+      'break', 'class', 'continue', 'def', 'del', 'elif', 'else', 'except', 'finally',
+      'for', 'from', 'global', 'if', 'import', 'in', 'is', 'lambda', 'nonlocal',
+      'not', 'or', 'pass', 'raise', 'return', 'try', 'while', 'with', 'yield'}.includes(self)) { return false; }
+  var normalized = self.pythonName();
+  var index = 0;
+  while (index < normalized.length()) {
+    var cp = normalized.codePointAt(index);
+    if (index = 0) {
+      if (cp <> 95 and not Native('java.lang.Character').isUnicodeIdentifierStart(cp)) { return false; }
+    }
+    else if (not Native('java.lang.Character').isUnicodeIdentifierPart(cp)
+      or Native('java.lang.Character').isIdentifierIgnorable(cp)) { return false; }
+    index = index + 1;
+    if (cp > 65535) { index = index + 1; }
+  }
+  return normalized.length() > 0;
+}
+operation NamedElement nameKey() : String {
+  if (self.name.isUndefined()) { return ''; }
+  if (self.isKindOf(Component)) { return self.name; }
+  return self.name.pythonName();
+}
+operation String sqlNameKey() : String {
+  var index = 0;
+  var bytes = 0;
+  while (index < self.length()) {
+    var cp = self.codePointAt(index);
+    var width = 4;
+    if (cp < 128) { width = 1; }
+    else if (cp < 2048) { width = 2; }
+    else if (cp < 65536) { width = 3; }
+    if (bytes + width > 63) { break; }
+    bytes = bytes + width;
+    var next = index + 1;
+    if (cp > 65535) { next = next + 1; }
+    index = next;
+  }
+  return self.substring(0, index);
+}
+operation NamedElement needsName() : Boolean {
+  if (self.isKindOf(Component)) { return self.hasRole('ContainerizedService'); }
+  if (self.isKindOf(Class)) {
+    return Sequence {'Router', 'Service', 'Repository', 'Entity'}.exists(r | self.hasRole(r));
+  }
+  if (self.isKindOf(Operation)) { return self.isMethod() or self.isOperationOf('Entity'); }
+  if (self.isKindOf(Property)) { return self.owner.isClassOf('Entity') and self.association.isUndefined(); }
+  if (self.isKindOf(Parameter)) {
+    return (self.owner.isMethod() or self.owner.isOperationOf('Entity')) and self.direction.name <> 'return';
+  }
+  return false;
+}
+operation NamedElement namingPeers() : Sequence {
+  if (self.isKindOf(Component)) {
+    return Component.all.select(c | c.isApplicationElement() and c.hasRole('ContainerizedService')
+      and c.getModel() = self.getModel()).asSequence();
+  }
+  if (self.isKindOf(Class)) {
+    return Class.all.select(c | c.isApplicationElement() and c.needsName() and c.owner = self.owner).asSequence();
+  }
+  if (self.isKindOf(Operation)) { return self.owner.ownedOperation.asSequence(); }
+  if (self.isKindOf(Property)) { return self.owner.scalarAttributes(); }
+  if (self.isKindOf(Parameter)) {
+    return self.owner.ownedParameter.select(p | p.direction.name <> 'return').asSequence();
+  }
+  return Sequence {};
+}
+operation Any pathContent() : Boolean {
+  if (self.isUndefined() or not self.isKindOf(String)) { return false; }
+  if (self.matches('(?s).*[\\p{Z}\\p{Cc}\\p{Cf}\\s].*') or self.contains('\\')
+      or self.contains('//') or self.contains('?') or self.contains('#') or self.contains('://')) { return false; }
+  return not self.split('/').exists(s | s = '.' or s = '..');
+}
+operation Any validPrefix() : Boolean {
+  return self.isDefined() and self.isKindOf(String) and self.length() > 1
+    and self.startsWith('/') and not self.endsWith('/') and self.pathContent()
+    and not self.contains('{') and not self.contains('}');
+}
+operation Any validPathExtension() : Boolean {
+  return self.isDefined() and self.isKindOf(String) and self.startsWith('/')
+    and (self = '/' or not self.endsWith('/'));
+}
+operation Any validPlaceholders() : Boolean {
+  if (self.isUndefined() or not self.isKindOf(String)) { return false; }
+  return self.split('/').forAll(s | (not s.contains('{') and not s.contains('}'))
+    or s.matches('\\{[A-Za-z_][A-Za-z0-9_]*\\}'));
+}
+operation Any pathParameters() : Sequence {
+  if (self.isUndefined() or not self.isKindOf(String)) { return Sequence {}; }
+  return self.split('/').select(s | s.matches('\\{[A-Za-z_][A-Za-z0-9_]*\\}'))
+    .collect(s | s.substring(1, s.length() - 1));
+}
+operation Any uniquePlaceholders() : Boolean {
+  var names = self.pathParameters();
+  return names.size() = names.asSet().size();
+}
+operation Operation httpMethod() : String {
+  var method = self.tag('method');
+  if (method.isUndefined()) { return ''; }
+  return method.name;
+}
+operation Operation validMethodAndPath() : Boolean {
+  return Sequence {'GET', 'POST', 'PUT', 'PATCH', 'DELETE'}.includes(self.httpMethod())
+    and self.tag('path').validPathExtension();
+}
+operation Operation endpointKey() : String {
+  var full = self.owner.tag('prefix') + self.tag('path');
+  return self.httpMethod() + ' ' + full.replaceAll('\\{[A-Za-z_][A-Za-z0-9_]*\\}', '{}');
+}
+@cached
+operation Association validEnds() : Boolean {
+  return self.memberEnd.size() = 2 and self.memberEnd.asSet().size() = 2
+    and self.memberEnd.forAll(e | e.type.isClassOf('Entity'));
+}
+@cached
+operation Association referenceEnd() : Any {
+  if (not self.validEnds()) { return null; }
+  var refs = self.memberEnd.select(e | e.isScalarMultiplicity());
+  var many = self.memberEnd.select(e | e.isMultiplicity(0, -1));
+  if (refs.size() <> 1 or many.size() <> 1) { return null; }
+  return refs.first();
+}
+operation Association referencingEntity() : Any {
+  var ref = self.referenceEnd();
+  if (ref.isUndefined()) { return null; }
+  return self.memberEnd.excluding(ref).first().type;
+}
+operation Association foreignKeyName() : Any {
+  var ref = self.referenceEnd();
+  if (ref.isUndefined() or ref.name.isUndefined() or not ref.type.hasValidKey()) { return null; }
+  return ref.name + '_' + ref.type.keys().first().name;
+}
+operation Parameter validParameterType() : Boolean { return self.type.isParameterType(); }
+operation Parameter validDirection() : Boolean { return Sequence {'in', 'return'}.includes(self.direction.name); }
+operation Parameter validParameterMultiplicity() : Boolean {
+  return self.isScalarMultiplicity() or (self.direction.name = 'return' and self.isMultiplicity(0, -1));
+}
+operation Parameter validDefault() : Boolean {
+  var value = self.defaultValue;
+  if (value.isUndefined()) { return true; }
+  if (self.direction.name <> 'in') { return false; }
+  if (value.isKindOf(LiteralNull)) { return self.isMultiplicity(0, 1); }
+  var type = self.type.primitiveName();
+  return (type = 'String' and value.isKindOf(LiteralString))
+    or (type = 'Integer' and value.isKindOf(LiteralInteger))
+    or (type = 'Boolean' and value.isKindOf(LiteralBoolean))
+    or (type = 'Real' and value.isKindOf(LiteralReal));
+}
+operation Operation validSignature() : Boolean {
+  return self.ownedParameter.select(p | p.direction.name = 'return').size() <= 1
+    and self.ownedParameter.forAll(p | p.validParameterType() and p.validDirection()
+      and p.validParameterMultiplicity() and p.validDefault());
+}
+
+context Class {
+  guard: self.isApplicationElement()
+  constraint RouterOwnedByApplication {
+    guard: self.hasRole('Router')
+    check: self.ownedBy('ApplicationService')
+    message: 'CON-01 Router ' + self.name + ' must belong to an ApplicationService'
+  }
+  constraint RouterPrefixHasCorrectSlashes {
+    guard: self.hasRole('Router')
+    check: self.tag('prefix').isDefined() and self.tag('prefix').length() > 1
+      and self.tag('prefix').startsWith('/') and not self.tag('prefix').endsWith('/')
+    message: 'CON-02 Router ' + self.name + ' needs a non-empty prefix starting with / and without a trailing /'
+  }
+  constraint RouterOperationsAreRoutes {
+    guard: self.hasRole('Router')
+    check: self.ownedOperation.forAll(o | o.isRoute())
+    message: 'CON-03 Every operation of Router ' + self.name + ' must be a Route'
+  }
+  constraint RouterRoutesHaveUniqueMethodAndPath {
+    guard: self.hasRole('Router')
+    check {
+      var routes = self.ownedOperation.select(o | o.isRoute() and o.validMethodAndPath());
+      var keys = routes.collect(o | o.httpMethod() + ' ' + o.tag('path'));
+      return keys.size() = keys.asSet().size();
+    }
+    message: 'CON-04 Router ' + self.name + ' repeats an HTTP method/path pair'
+  }
+  critique RouterHasRoutes {
+    guard: self.hasRole('Router')
+    check: self.ownedOperation.exists(o | o.isRoute())
+    message: 'CON-05 Router ' + self.name + ' has no routes'
+  }
+  constraint ServicesAndRepositoriesBelongToApplication {
+    guard: self.hasRole('Service') or self.hasRole('Repository')
+    check: self.ownedBy('ApplicationService')
+    message: 'CON-09 Service or Repository ' + self.name + ' must belong to an ApplicationService'
+  }
+  constraint EntityBelongsToDatabase {
+    guard: self.hasRole('Entity')
+    check: self.ownedBy('DatabaseService')
+    message: 'CON-10 Entity ' + self.name + ' must belong to a DatabaseService'
+  }
+  constraint EntityHasOnePrimaryKey {
+    guard: self.hasRole('Entity')
+    check: self.keys().size() = 1
+    message: 'CON-11 Entity ' + self.name + ' must have exactly one scalar primary-key attribute'
+  }
+  constraint EntityScalarColumnsHaveSupportedTypes {
+    guard: self.hasRole('Entity')
+    check: self.scalarAttributes().forAll(a | a.type.isScalarType())
+    message: 'CON-12 Scalar columns of Entity ' + self.name + ' need supported standard UML primitive types'
+  }
+  constraint ClassHasAtMostOneMicroserviceRole {
+    check: Sequence {'Entity', 'Service', 'Repository', 'Router'}.select(r | self.hasRole(r)).size() <= 1
+    message: 'CON-20 Class ' + self.name + ' has multiple microservice roles'
+  }
+  constraint RouterUsesOneRepository {
+    guard: self.hasRole('Router')
+    check {
+      var repos = self.routerScope().select(c | c.isClassOf('Repository'));
+      return repos.size() = 1 and self.ownedOperation.select(o | o.isRoute()).forAll(o |
+        o.reachedRepositories() = repos);
+    }
+    message: 'CON-24 Router ' + self.name + ' and every route must use exactly the same one repository'
+  }
+  constraint RepositoryIsExclusiveToOneRouter {
+    guard: self.hasRole('Repository')
+    check: routers().select(r | r.routerScope().includes(self)).size() <= 1
+    message: 'CON-25 Repository ' + self.name + ' is shared by different routers'
+  }
+  constraint ServiceIsExclusiveToOneRouter {
+    guard: self.hasRole('Service')
+    check: routers().select(r | r.routerScope().includes(self)).size() <= 1
+    message: 'CON-26 Service ' + self.name + ' is shared by different routers'
+  }
+  constraint RouterScopeStaysWithinApplication {
+    guard: self.hasRole('Router')
+    check: self.ownedBy('ApplicationService') and self.routerScope().forAll(c |
+      c.ownedBy('ApplicationService') and c.owner = self.owner)
+    message: 'CON-27 Router ' + self.name + ' has services or repositories outside its application'
+  }
+  constraint RepositoryApplicationDependsOnEntityDatabase {
+    guard: self.hasRole('Repository')
+    check: dependencies().select(d | d.client.includes(self)).forAll(d |
+      d.supplier.select(s | s.isClassOf('Entity')).forAll(e |
+        self.ownedBy('ApplicationService') and e.ownedBy('DatabaseService') and self.owner.dependsOn(e.owner)))
+    message: 'CON-28 Repository ' + self.name + ' accesses an entity whose database is not a dependency of its application'
+  }
+  constraint RouterPrefixIsStatic {
+    guard: self.hasRole('Router')
+    check: self.tag('prefix').isDefined() and not self.tag('prefix').contains('{') and not self.tag('prefix').contains('}')
+    message: 'CON-34 Router ' + self.name + ' prefix must contain only fixed path segments'
+  }
+}
+
+context Operation {
+  guard: self.isApplicationElement()
+  constraint RouteBelongsToRouter {
+    guard: self.isRoute()
+    check: self.isOperationOf('Router')
+    message: 'CON-06 Route ' + self.name + ' must belong to a Router'
+  }
+  constraint RouteHasMethodAndPathExtension {
+    guard: self.isRoute()
+    check: self.validMethodAndPath()
+    message: 'CON-07 Route ' + self.name + ' needs a supported HTTP method and / or a slash-prefixed path without a trailing /'
+  }
+  constraint RoutePlaceholdersHaveExactlyOneInput {
+    guard: self.isRoute()
+    check: self.tag('path').pathParameters().forAll(n |
+      self.ownedParameter.select(p | p.direction.name = 'in' and p.name = n).size() = 1)
+    message: 'CON-08 Route ' + self.name + ' needs exactly one matching input for each path placeholder'
+  }
+  constraint RouteCallChainUsesOneRepository {
+    guard: self.isRoute()
+    check: self.reachedRepositories().size() = 1
+    message: 'CON-21 Route ' + self.name + ' must reach methods on exactly one repository through its complete call chain'
+  }
+  constraint RoutePlaceholdersAreWholeNamedSegments {
+    guard: self.isRoute()
+    check: self.tag('path').validPlaceholders()
+    message: 'CON-36 Route ' + self.name + ' has malformed, embedded or converter-style placeholders'
+  }
+  constraint RoutePlaceholderNamesAreUnique {
+    guard: self.isRoute()
+    check: self.tag('path').uniquePlaceholders()
+    message: 'CON-37 Route ' + self.name + ' repeats a path placeholder name'
+  }
+  constraint RoutePathInputsAreRequiredScalars {
+    guard: self.isRoute()
+    check: self.tag('path').pathParameters().forAll(n |
+      self.ownedParameter.select(p | p.direction.name = 'in' and p.name = n).forAll(p |
+        p.isMultiplicity(1, 1) and p.type.isScalarType() and p.defaultValue.isUndefined()))
+    message: 'CON-38 Route ' + self.name + ' path inputs must be required scalar values without defaults'
+  }
+  constraint FullRouteUrlIsValid {
+    guard: self.isRoute()
+    check {
+      if (not self.isOperationOf('Router')) { return false; }
+      var prefix = self.owner.tag('prefix');
+      var path = self.tag('path');
+      if (not prefix.validPrefix() or not path.validPathExtension()) { return false; }
+      var full = prefix + path;
+      return full.pathContent() and full.validPlaceholders() and full.uniquePlaceholders();
+    }
+    message: 'CON-39 Route ' + self.name + ' needs a valid full URL formed by exact prefix-plus-path concatenation'
+  }
+  constraint MethodHasAtMostOneReturnParameter {
+    guard: self.isMethod()
+    check: self.ownedParameter.select(p | p.direction.name = 'return').size() <= 1
+    message: 'CON-51 Method ' + self.name + ' has more than one return parameter'
+  }
+}
+
+context Component {
+  guard: self.isApplicationElement()
+  constraint ContainerPortsAreInRange {
+    guard: self.hasRole('ContainerizedService')
+    check: Sequence {self.tag('hostPort'), self.tag('containerPort')}.forAll(p |
+      p.isDefined() and p >= 1 and p <= 65535)
+    message: 'CON-13 Container ' + self.name + ' ports must be in 1..65535'
+  }
+  constraint ContainersUseDifferentHostPorts {
+    guard: self.hasRole('ContainerizedService')
+    check: Component.all.select(c | c.isApplicationElement() and c.hasRole('ContainerizedService') and c <> self)
+      .forAll(c | c.tag('hostPort') <> self.tag('hostPort'))
+    message: 'CON-14 Container ' + self.name + ' shares its host port with another container'
+  }
+  constraint DatabaseHasNameAndVolume {
+    guard: self.hasRole('DatabaseService')
+    check: self.tag('databaseName').isDefined() and self.tag('databaseName').trim().length() > 0
+      and self.tag('databaseVolume').isDefined() and self.tag('databaseVolume').trim().length() > 0
+    message: 'CON-15 Database ' + self.name + ' needs a database name and volume'
+  }
+  critique ApplicationDependsOnDatabase {
+    guard: self.hasRole('ApplicationService')
+    check: dependencies().exists(d | d.client.includes(self) and d.supplier.exists(s | s.hasRole('DatabaseService')))
+    message: 'CON-16 Application ' + self.name + ' has no database dependency'
+  }
+  constraint ApplicationRoutesHaveUniqueFullPatterns {
+    guard: self.hasRole('ApplicationService')
+    check {
+      var keys = new Sequence;
+      for (router in self.packagedElement.select(c | c.isClassOf('Router') and c.tag('prefix').validPrefix())) {
+        for (route in router.ownedOperation.select(o | o.isRoute() and o.validMethodAndPath()
+            and o.tag('path').validPlaceholders())) { keys.add(route.endpointKey()); }
+      }
+      return keys.size() = keys.asSet().size();
+    }
+    message: 'CON-29 Application ' + self.name + ' repeats an HTTP method and full URL pattern across its routes'
+  }
+  constraint ContainerHasAtMostOneApplicationOrDatabaseRole {
+    check: not (self.hasRole('ApplicationService') and self.hasRole('DatabaseService'))
+    message: 'CON-33 Component ' + self.name + ' cannot be both an application and a database'
+  }
+}
+
+context Dependency {
+  guard: self.isApplicationElement()
+  constraint DependencyConnectsPermittedTypes {
+    check: not self.client.isEmpty() and not self.supplier.isEmpty()
+      and self.client.forAll(c | self.supplier.forAll(s | c.allowedDependency(s)))
+    message: 'CON-17 Dependency ' + self.name + ' connects types in an unsupported direction'
+  }
+  constraint ClassDependenciesHaveMatchingMethodCalls {
+    guard: self.client.exists(c | c.isClassOf('Router') or c.isClassOf('Service'))
+      and self.supplier.exists(s | s.isClassOf('Service') or s.isClassOf('Repository'))
+    check: self.client.forAll(c | self.supplier.forAll(s | dependencies().exists(d |
+      d.client.exists(o | o.isKindOf(Operation) and o.owner = c
+        and d.supplier.exists(target | target.isKindOf(Operation) and target.owner = s
+          and o.allowedMethodCall(target))))))
+    message: 'CON-22 Router or Service dependency ' + self.name + ' has no matching method dependency'
+  }
+  constraint MethodCallsHaveMatchingClassDependencies {
+    guard: self.client.exists(c | c.isKindOf(Operation)) and self.supplier.exists(s | s.isKindOf(Operation))
+    check: self.client.forAll(c | self.supplier.forAll(s | c.owner.isDefined() and s.owner.isDefined()
+      and (c.owner = s.owner or c.owner.dependsOn(s.owner))))
+    message: 'CON-23 Method dependency ' + self.name + ' has no corresponding dependency between its classes'
+  }
+  constraint DeclaredUsageConnectsOneCallerToOneMethod {
+    guard: self.client.exists(c | c.isKindOf(Operation)) or self.supplier.exists(s | s.isKindOf(Operation))
+    check: self.client.size() = 1 and self.supplier.size() = 1
+      and self.client.forAll(c | self.supplier.forAll(s | c.allowedMethodCall(s)))
+    message: 'CON-54 Each method dependency must connect one route or service method to one service or repository method'
+  }
+  constraint CalledMethodsResolveToValidOwnedOperations {
+    guard: self.client.exists(c | c.isKindOf(Operation)) or self.supplier.exists(s | s.isKindOf(Operation))
+    check: not self.supplier.isEmpty() and self.supplier.forAll(s |
+      s.isDefined() and not s.eIsProxy() and (s.isOperationOf('Service') or s.isOperationOf('Repository'))
+      and s.validSignature())
+    message: 'CON-55 A called method must resolve to an owned service or repository operation with a valid signature'
+  }
+}
+
+context NamedElement {
+  guard: self.isApplicationElement() and self.needsName()
+  constraint ModeledElementsHaveNames {
+    check: self.name.cleanName()
+    message: 'CON-30 Modeled ' + self.eClass().name + ' needs a non-empty name without surrounding whitespace'
+  }
+  constraint NamesAreUniqueWithinTheirScopes {
+    guard: self.name.isDefined()
+    check: self.namingPeers().excluding(self).forAll(e | e.name.isUndefined() or e.nameKey() <> self.nameKey())
+    message: 'CON-31 Name ' + self.name + ' is duplicated in its naming scope'
+  }
+  constraint PythonNamesAreValidIdentifiers {
+    guard: not self.isKindOf(Component)
+    check: self.name.pythonIdentifier()
+    message: 'CON-32 Name ' + self.name + ' is not a valid Python identifier or is a reserved keyword'
+  }
+}
+
+// CON-35 covers both Router prefixes and Route path extensions.
+context Element {
+  guard: self.isApplicationElement() and (self.hasRole('Router') or self.isRoute())
+  constraint PrefixAndPathContainOnlyPathContent {
+    check: (not self.hasRole('Router') or self.tag('prefix').pathContent())
+      and (not self.isRoute() or self.tag('path').pathContent())
+    message: 'CON-35 Router prefix or route path contains whitespace, invalid separators or non-path content'
+  }
+}
+
+context Association {
+  guard: self.isApplicationElement()
+  constraint EntityAssociationHasTwoEntityEnds {
+    check: self.validEnds()
+    message: 'CON-18 Association ' + self.name + ' must have exactly two distinct Entity-typed ends'
+  }
+  constraint AssociationMultiplicitiesIdentifyOneForeignKeyLocation {
+    check: self.referenceEnd().isDefined()
+    message: 'CON-19 Association ' + self.name + ' must pair 1..1 or 0..1 with 0..*'
+  }
+  constraint AssociationPropertiesHaveConsistentMembershipAndOwnership {
+    check: self.validEnds() and self.memberEnd.forAll(e | e.association = self
+      and (e.owner = self or e.owner = self.memberEnd.excluding(e).first().type))
+    message: 'CON-42 Association ' + self.name + ' has an end with inconsistent membership or ownership'
+  }
+  constraint AssociatedEntitiesShareOneDatabase {
+    check: self.validEnds() and self.memberEnd.forAll(e | e.type.ownedBy('DatabaseService'))
+      and self.memberEnd.collect(e | e.type.owner).asSet().size() = 1
+    message: 'CON-43 Association ' + self.name + ' must connect entities in the same database container'
+  }
+  constraint AssociationRoleNamesAreUsableAndUnique {
+    check {
+      if (not self.validEnds()) { return false; }
+      for (end in self.memberEnd) {
+        if (not end.name.pythonIdentifier()) { return false; }
+        var entity = self.memberEnd.excluding(end).first().type;
+        var names = entity.scalarAttributes().select(a | a.name.isDefined()).collect(a | a.nameKey());
+        for (association in Association.all.select(a | a.isApplicationElement() and a.validEnds())) {
+          for (role in association.memberEnd) {
+            if (role <> end and association.memberEnd.excluding(role).first().type = entity
+                and role.name.isDefined()) { names.add(role.nameKey()); }
+          }
+        }
+        if (names.includes(end.nameKey())) { return false; }
+      }
+      return true;
+    }
+    message: 'CON-44 Association ' + self.name + ' has invalid, duplicate or conflicting role names'
+  }
+  constraint EntityReferenceResolvesToOneMappedKey {
+    guard: self.referenceEnd().isDefined()
+    check: self.referenceEnd().type.hasValidKey()
+    message: 'CON-47 Association ' + self.name + ' references an entity without exactly one valid mapped primary key'
+  }
+}
+
+context Class {
+  guard: self.isApplicationElement() and self.hasRole('Entity')
+  constraint GeneratedForeignKeyNamesDoNotCollide {
+    check {
+      var names = self.scalarAttributes().select(a | a.name.isDefined()).collect(a | a.name.sqlNameKey());
+      for (association in Association.all.select(a | a.isApplicationElement())) {
+        if (association.referencingEntity() = self) {
+          var name = association.foreignKeyName();
+          if (name.isDefined()) { names.add(name.sqlNameKey()); }
+        }
+      }
+      return names.size() = names.asSet().size();
+    }
+    message: 'CON-45 Entity ' + self.name + ' has colliding scalar or generated foreign-key column names'
+  }
+}
+
+context Property {
+  guard: self.isApplicationElement()
+  constraint PrimaryKeyIsRequiredAndScalar {
+    guard: self.isID and (self.owner.isClassOf('Entity') or self.association.isDefined())
+    check: self.owner.isClassOf('Entity') and self.association.isUndefined() and self.isMultiplicity(1, 1)
+    message: 'CON-40 Identifying property ' + self.name + ' must be an entity-owned scalar attribute at 1..1'
+  }
+  constraint PrimaryKeyTypeIsIntegerOrString {
+    guard: self.isID and self.owner.isClassOf('Entity') and self.association.isUndefined()
+    check: self.type.isKeyType()
+    message: 'CON-41 Primary-key attribute ' + self.name + ' must use standard UML Integer or String'
+  }
+  constraint EntityReferencesHaveExplicitAssociations {
+    guard: self.owner.isClassOf('Entity') and self.type.isClassOf('Entity')
+    check: self.association.isDefined() and self.association.memberEnd.includes(self)
+    message: 'CON-46 Entity reference ' + self.name + ' must participate in an explicit association'
+  }
+  constraint ScalarEntityAttributesAreSingleValued {
+    guard: self.owner.isClassOf('Entity') and self.association.isUndefined()
+    check: self.isScalarMultiplicity()
+    message: 'CON-48 Scalar entity attribute ' + self.name + ' must have multiplicity 1..1 or 0..1'
+  }
+}
+
+context Parameter {
+  guard: self.isApplicationElement() and self.owner.isMethod()
+  constraint MethodParametersHaveSupportedTypes {
+    check: self.validParameterType()
+    message: 'CON-49 Method parameter ' + self.name + ' must reference a supported primitive or Entity type'
+  }
+  constraint MethodParametersUseInputOrReturnDirections {
+    check: self.validDirection()
+    message: 'CON-50 Method parameter ' + self.name + ' must have direction in or return'
+  }
+  constraint MethodParametersHaveSupportedMultiplicities {
+    check: self.validParameterMultiplicity()
+    message: 'CON-52 Method parameter ' + self.name + ' has an unsupported multiplicity'
+  }
+  constraint MethodParameterDefaultsMatchDeclarations {
+    check: self.validDefault()
+    message: 'CON-53 Method parameter ' + self.name + ' has an unsupported or incompatible default value'
+  }
+}

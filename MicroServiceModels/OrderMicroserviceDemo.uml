@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xmi:XMI xmi:version="20131001" xmlns:xmi="http://www.omg.org/spec/XMI/20131001" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:MicroservicesProfile="http:///schemas/MicroservicesProfile/_KMEvgORNEfGtPdePy1LCEg/4" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmlns:uml="http://www.eclipse.org/uml2/5.0.0/UML" xsi:schemaLocation="http:///schemas/MicroservicesProfile/_KMEvgORNEfGtPdePy1LCEg/4 ../MicroservicesProfile/MicroservicesProfile.profile.uml#_KMHLwORNEfGtPdePy1LCEg">
+  <uml:Model xmi:id="_S-6BoOROEfGtPdePy1LCEg" name="OrderMicroserviceDemo" visibility="private">
+    <packageImport xmi:type="uml:PackageImport" xmi:id="_TJT60OROEfGtPdePy1LCEg">
+      <importedPackage xmi:type="uml:Model" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#_0"/>
+    </packageImport>
+    <packagedElement xmi:type="uml:Component" xmi:id="_3jCbAORQEfGtPdePy1LCEg" name="OrderDatabase">
+      <packagedElement xmi:type="uml:Class" xmi:id="_--6hQORREfGtPdePy1LCEg" name="Order"/>
+      <packagedElement xmi:type="uml:Class" xmi:id="_BZBMMORSEfGtPdePy1LCEg" name="Customer"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Component" xmi:id="_qBzDkORQEfGtPdePy1LCEg" name="OrderApplication">
+      <packagedElement xmi:type="uml:Class" xmi:id="_nbY2cORaEfGtPdePy1LCEg" name="OrderRouter"/>
+      <packagedElement xmi:type="uml:Class" xmi:id="_wlKeYORaEfGtPdePy1LCEg" name="CustomerRouter"/>
+      <packagedElement xmi:type="uml:Class" xmi:id="_1lxRgORaEfGtPdePy1LCEg" name="OrderRepostory"/>
+      <packagedElement xmi:type="uml:Class" xmi:id="_3gX9AORaEfGtPdePy1LCEg" name="CustomerRepository"/>
+      <packagedElement xmi:type="uml:Class" xmi:id="_5W4LoORaEfGtPdePy1LCEg" name="OrderService"/>
+      <packagedElement xmi:type="uml:Class" xmi:id="_6tMeUORaEfGtPdePy1LCEg" name="PaymentService"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Interface" xmi:id="_RILzwORSEfGtPdePy1LCEg" name="OrderAPI">
+      <ownedOperation xmi:type="uml:Operation" xmi:id="_qwGTAORbEfGtPdePy1LCEg" name="getOrder" visibility="package">
+        <ownedParameter xmi:type="uml:Parameter" xmi:id="_0Dz6EORbEfGtPdePy1LCEg" name="id">
+          <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Integer"/>
+        </ownedParameter>
+        <ownedParameter xmi:type="uml:Parameter" xmi:id="_O4Mo8ORkEfGtPdePy1LCEg" name="name">
+          <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+        </ownedParameter>
+      </ownedOperation>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Interface" xmi:id="_oku9wORSEfGtPdePy1LCEg" name="CustomerAPI"/>
+    <profileApplication xmi:type="uml:ProfileApplication" xmi:id="_LyfBwORPEfGtPdePy1LCEg">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_LyfBweRPEfGtPdePy1LCEg" source="http://www.eclipse.org/uml2/2.0.0/UML">
+        <references xmi:type="ecore:EPackage" href="../MicroservicesProfile/MicroservicesProfile.profile.uml#_KMHLwORNEfGtPdePy1LCEg"/>
+      </eAnnotations>
+      <appliedProfile xmi:type="uml:Profile" href="../MicroservicesProfile/MicroservicesProfile.profile.uml#_D47iUN3-EfGlcuXNC_n1HQ"/>
+    </profileApplication>
+  </uml:Model>
+  <MicroservicesProfile:ApplicationService xmi:id="_1yWggORQEfGtPdePy1LCEg" base_Component="_qBzDkORQEfGtPdePy1LCEg"/>
+  <MicroservicesProfile:DatabaseService xmi:id="_6J69sORQEfGtPdePy1LCEg" base_Component="_3jCbAORQEfGtPdePy1LCEg"/>
+  <MicroservicesProfile:Entity xmi:id="_AmBpAORSEfGtPdePy1LCEg" base_Class="_--6hQORREfGtPdePy1LCEg"/>
+  <MicroservicesProfile:Entity xmi:id="_Cjbw4ORSEfGtPdePy1LCEg" base_Class="_BZBMMORSEfGtPdePy1LCEg"/>
+  <MicroservicesProfile:RestAPI xmi:id="_VTxDYORSEfGtPdePy1LCEg" prefix="/orders" base_Interface="_RILzwORSEfGtPdePy1LCEg"/>
+  <MicroservicesProfile:RestAPI xmi:id="_qs9OgORSEfGtPdePy1LCEg" base_Interface="_oku9wORSEfGtPdePy1LCEg"/>
+  <MicroservicesProfile:Router xmi:id="_qTnAwORaEfGtPdePy1LCEg" base_Class="_nbY2cORaEfGtPdePy1LCEg"/>
+  <MicroservicesProfile:Router xmi:id="_0n1CkORaEfGtPdePy1LCEg" base_Class="_wlKeYORaEfGtPdePy1LCEg"/>
+  <MicroservicesProfile:Repository xmi:id="_9I_yYORaEfGtPdePy1LCEg" base_Class="_1lxRgORaEfGtPdePy1LCEg"/>
+  <MicroservicesProfile:Repository xmi:id="_-5-n0ORaEfGtPdePy1LCEg" base_Class="_3gX9AORaEfGtPdePy1LCEg"/>
+  <MicroservicesProfile:Service xmi:id="_A34e8ORbEfGtPdePy1LCEg" base_Class="_5W4LoORaEfGtPdePy1LCEg"/>
+  <MicroservicesProfile:Service xmi:id="_CdiOIORbEfGtPdePy1LCEg" base_Class="_6tMeUORaEfGtPdePy1LCEg"/>
+  <MicroservicesProfile:Route xmi:id="_C_zYQORcEfGtPdePy1LCEg" path="/{orderId}" base_Operation="_qwGTAORbEfGtPdePy1LCEg"/>
+</xmi:XMI>

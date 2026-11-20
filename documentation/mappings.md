@@ -1,6 +1,6 @@
 # Microservice UML Mapping Specification
 
-This document defines how microservice concepts map to UML elements and stereotypes, as well as the UML relationships used between them. It documents the **modeling rules**; it does not imply that code generation or EVL validation is already implemented.
+This document defines how microservice concepts map to UML elements and stereotypes, as well as the UML relationships used between them. It documents the **modeling rules**; EVL implementation and verification are described in Section 5.1, while code generation remains separate work.
 
 ## Table of Contents
 
@@ -397,8 +397,9 @@ column or automatic value generation.
 
 Keep all EVL validation rules here instead of repeating them in every element mapping.
 Rules are specified for EVL (Epsilon Validation Language) and run against the model from
-a separate `.evl` file; they are not stored in the profile. The table records proposed
-modeling requirements; current implementation coverage is described in Section 5.1.
+a separate `.evl` file; they are not stored in the profile. The table records
+modeling requirements and their EVL implementation status. Verification is described
+in Section 5.1.
 
 `constraint` blocks report errors, `critique` blocks report warnings.
 
@@ -408,78 +409,89 @@ is an operation on a `«Repository»` class.
 
 | ID | Name | Applies to | Rule | Kind | Source | Status |
 |---|---|---|---|---|---|---|
-| CON-01 | Router belongs to an application | `«Router»` | Every router is owned by an `«ApplicationService»` component | constraint | REL-01 | Proposed |
-| CON-02 | Router prefix starts with a slash and has no trailing slash | `«Router»` | Every router has a non-empty `prefix` starting with `/` and not ending with `/`; neither an empty prefix nor `/` alone is allowed | constraint | MAP-08, Section 5.8 | Proposed |
-| CON-03 | Router methods are routes | `«Router»` | Every operation owned by a router has `«Route»` applied | constraint | REL-05 | Proposed |
-| CON-04 | Routes have unique HTTP methods and paths | `«Router»` | No two routes in the same router share the same (`method`, `path`) pair | constraint | MAP-04 | Proposed |
-| CON-05 | Router has at least one route | `«Router»` | Every router owns at least one route | critique | MAP-08 | Proposed |
-| CON-06 | Route belongs to a router | `«Route»` | Every route is owned by a `«Router»` class | constraint | MAP-04, REL-05 | Proposed |
-| CON-07 | Route has an HTTP method and a path extension | `«Route»` | Every route has a `method` and a non-empty `path` that is either `/` or starts with `/` without ending with `/` | constraint | MAP-04, Section 5.8 | Proposed |
-| CON-08 | Each route path parameter has exactly one matching input | `«Route»` | Every `{name}` in a route's path matches exactly one owned `in` parameter called `name` | constraint | MAP-04, Section 5.8 | Proposed |
-| CON-09 | Services and repositories belong to an application | `«Service»`, `«Repository»` | Every service and repository is owned by an `«ApplicationService»` component | constraint | REL-02, REL-03 | Proposed |
-| CON-10 | Entity belongs to a database | `«Entity»` | Every entity is owned by a `«DatabaseService»` component | constraint | REL-04 | Proposed |
-| CON-11 | Entity has exactly one primary-key attribute | `«Entity»` | Every entity has exactly one owned scalar attribute with `isID = true`; composite primary keys are rejected | constraint | PROP-02, Section 5.9 | Proposed |
-| CON-12 | Entity scalar columns have supported types | Scalar attributes owned by `«Entity»` | Every attribute with no association has a standard UML primitive type with a supported SQL mapping in Section 4.6; association ends are validated as relationships | constraint | PROP-01, PROP-03, Section 5.9 | Proposed |
-| CON-13 | Container ports are in range | `«ContainerizedService»` | Every container's `hostPort` and `containerPort` are in `1..65535` | constraint | MAP-00, MAP-01, MAP-02 | Proposed |
-| CON-14 | Containers use different host ports | `«ContainerizedService»` | No two containerized services share the same `hostPort` | constraint | MAP-00 | Proposed |
-| CON-15 | Database has a name and volume | `«DatabaseService»` | Every database has non-empty `databaseName` and `databaseVolume` values | constraint | MAP-02 | Proposed |
-| CON-16 | Application depends on a database | `«ApplicationService»` | Every application depends on at least one `«DatabaseService»` | critique | REL-09 | Proposed |
-| CON-17 | Dependencies connect permitted types | `Dependency` (including `Usage`) | Dependencies between containers, routers, services, repositories, entities and methods follow the directions listed in Section 4.2 | constraint | REL-09 to REL-14, REL-16 to REL-19 | Proposed |
-| CON-18 | Entity association has exactly two entity ends | Application-model `Association` | Every supported database association has exactly two distinct member-end properties, each typed by a `«Entity»` class | constraint | REL-15, Section 5.9 | Proposed |
-| CON-19 | Association multiplicities identify one foreign-key location | Entity `Association` | Exactly one end has multiplicity `1..1` or `0..1`, and the other has multiplicity `0..*`; one-to-one, many-to-many and other combinations are rejected initially | constraint | Section 4.7, Section 5.9 | Proposed |
-| CON-20 | Class has at most one microservice role | `Class` | A class has at most one of `«Entity»`, `«Service»`, `«Repository»` or `«Router»` applied | constraint | MAP-06 to MAP-09 | Proposed |
-| CON-21 | Route call chain uses exactly one repository | `«Route»` | Follow every method call from a route, including calls through services and utilities; all repository methods reached belong to exactly one repository | constraint | REL-16 to REL-19, Section 5.2 | Proposed |
-| CON-22 | Router and service dependencies have matching method calls | Dependencies from a `«Router»` or `«Service»` to a `«Service»` or `«Repository»` | At least one route on the router, or method on the service, calls a method on the specific service or repository it depends on (see Section 5.3) | constraint | REL-10 to REL-13, REL-16 to REL-19 | Proposed |
-| CON-23 | Method calls have matching router and service dependencies | Calls from routes or service methods to service or repository methods | Every call between different classes has the matching router-to-service, router-to-repository, service-to-repository or service-to-service dependency described in Section 5.3 | constraint | REL-10 to REL-13, REL-16 to REL-19 | Proposed |
-| CON-24 | Router uses exactly one repository | `«Router»` | Across the router's direct dependencies and all service dependencies in its scope, exactly one repository is reached; every route uses that same repository | constraint | REL-10 to REL-13, CON-21, Section 5.2 | Proposed |
-| CON-25 | Repository is used by at most one router scope | `«Repository»` | Two different routers cannot reach the same repository, either directly or through services | constraint | REL-10 to REL-13, Section 5.2 | Proposed |
-| CON-26 | Service is used by at most one router scope | `«Service»` | A service, including a utility service, cannot be shared between different router scopes; routes within the same router may share it | constraint | REL-10, REL-13, Section 5.2 | Proposed |
-| CON-27 | Router scope stays within one application | `«Router»` | The router and all services and repositories in its scope are owned by the same `«ApplicationService»` component | constraint | REL-01 to REL-03, Section 5.2 | Proposed |
-| CON-28 | Repository's application depends on each accessed entity's database | `«Repository»` | For every entity the repository accesses, the `«ApplicationService»` owning that repository has a dependency on the `«DatabaseService»` owning that entity | constraint | REL-03, REL-04, REL-09, REL-14, Section 5.4 | Proposed |
-| CON-29 | Application routes have unique HTTP methods and full URL patterns | `«ApplicationService»` | Across all routers in an application, no two routes have the same HTTP method and full URL pattern, even when their path parameter names differ | constraint | MAP-04, MAP-08, REL-01, REL-05, Section 5.5 | Proposed |
-| CON-30 | Modeled containers, classes and members have names | Containers, routers, services, repositories, entities, methods, entity columns and non-return parameters | Each element has a non-empty name with no leading or trailing whitespace; return parameters may be unnamed | constraint | MAP-00 to MAP-02, MAP-04, MAP-06 to MAP-09, Section 5.6 | Proposed |
-| CON-31 | Names are unique within their defined scopes | Named elements covered by CON-30 | Container, class, method, column and parameter names are unique in the scopes listed in Section 5.6 | constraint | Section 5.6 | Proposed |
-| CON-32 | Python class, method, column and parameter names are valid identifiers | Routers, services, repositories, entities, methods, entity columns and non-return parameters | Names are valid Python identifiers and are not reserved Python keywords for the target Python version | constraint | MAP-04, MAP-06 to MAP-09, Section 5.6 | Proposed |
-| CON-33 | Container has at most one application or database role | `Component` | A component cannot have both `«ApplicationService»` and `«DatabaseService»` applied | constraint | MAP-01, MAP-02, Section 5.7 | Proposed |
-| CON-34 | Router prefix contains only fixed path segments | `«Router»` | Router prefixes contain no `{` or `}` characters and cannot declare path parameters | constraint | MAP-08, Section 5.8 | Proposed |
-| CON-35 | Router prefix and route path contain only path content | `«Router»`, `«Route»` | Prefixes and paths contain no whitespace, control characters, backslashes, `//`, query strings, fragments, schemes, authorities or standalone `.` and `..` segments | constraint | MAP-04, MAP-08, Section 5.8 | Proposed |
-| CON-36 | Route placeholders are complete named path segments | `«Route»` | Each placeholder occupies a whole segment and has exactly the form `{name}`, where `name` matches `[A-Za-z_][A-Za-z0-9_]*`; empty, unmatched, nested, embedded or converter-style placeholders are invalid | constraint | MAP-04, Section 5.8 | Proposed |
-| CON-37 | Route path parameter names are not repeated | `«Route»` | No placeholder name occurs more than once in the same route path | constraint | MAP-04, Section 5.8 | Proposed |
-| CON-38 | Route path inputs are required scalar values | Inputs matched by CON-08 | Each matching `in` parameter has multiplicity `1..1`, no default value and a supported scalar type from Section 5.8 | constraint | MAP-04, Section 5.8 | Proposed |
-| CON-39 | Full route URL is the validated prefix plus path | `«Route»` | Concatenate the owning router's validated prefix and the route's validated path exactly; the result satisfies CON-35 to CON-37 and participates in application-wide uniqueness under CON-29 | constraint | MAP-04, MAP-08, CON-29, Section 5.8 | Proposed |
-| CON-40 | Primary-key attribute is required and scalar | Entity identifying attributes and entity-association ends | Every property with `isID = true` is an entity-owned scalar attribute with no association and multiplicity `1..1`; association ends cannot be primary-key attributes | constraint | PROP-02, Section 5.9 | Proposed |
-| CON-41 | Primary-key type is Integer or String | Entity's primary-key attribute | The identifying attribute uses the actual standard UML `Integer` or `String` type, mapped to `BIGINT` or `TEXT` respectively | constraint | Section 4.6, Section 5.9 | Proposed |
-| CON-42 | Association properties have consistent membership and ownership | Entity association ends | Each member-end property's `association` refers to that association; its owner is either that association or the entity typed by the opposite end | constraint | REL-15, Section 5.9 | Proposed |
-| CON-43 | Associated entities belong to the same database | Entity `Association` | Both end types are entities owned by the same `«DatabaseService»` component | constraint | REL-04, REL-15, Section 5.9 | Proposed |
-| CON-44 | Association role names are usable and unambiguous | Entity association ends | Both ends have non-empty Python identifier role names that are not reserved keywords; roles interpreted as properties on the same entity are unique and do not duplicate scalar attribute names | constraint | Section 4.7, Section 5.9 | Proposed |
-| CON-45 | Generated foreign-key column names do not collide | Referencing `«Entity»` | Each derived foreign-key name is distinct from scalar column names and every other generated foreign-key name in that table under the target SQL identifier rules | constraint | SQL-04, Section 5.9 | Proposed |
-| CON-46 | Entity references participate in explicit associations | Entity-typed attributes owned by `«Entity»` | An attribute typed by another entity or by its own entity class participates in a valid association and is included in that association's member ends | constraint | REL-15, Section 5.9 | Proposed |
-| CON-47 | Entity reference resolves to one mapped primary key | Reference end of an entity association | The target entity has exactly one valid primary-key attribute satisfying CON-11, CON-40 and CON-41, from which SQL and Python foreign-key types can be derived | constraint | SQL-05, Section 5.9 | Proposed |
-| CON-48 | Scalar entity attributes are single-valued | Attributes owned by `«Entity»` with no association | Each scalar attribute has multiplicity `1..1` or `0..1`; collection-valued scalar columns require a separate mapping | constraint | PROP-01, SQL-01, Section 5.9 | Proposed |
-| CON-49 | Method parameters reference supported types | Parameters of router, service and repository methods | Every input and return parameter resolves to the standard UML `String`, `Integer`, `Boolean` or `Real` type, or to a class with `«Entity»` applied | constraint | MAP-04, MAP-06 to MAP-09, Section 5.10 | Proposed |
-| CON-50 | Method parameters use input or return directions | Parameters of router, service and repository methods | Only `in` and `return` directions are supported; `out` and `inout` are rejected | constraint | Section 5.10 | Proposed |
-| CON-51 | Method has at most one return parameter | Router, service and repository methods | Each method has zero or one owned parameter with direction `return`; zero means no result value | constraint | Section 5.10 | Proposed |
-| CON-52 | Method parameters use supported multiplicities | Parameters of router, service and repository methods | Inputs use `1..1` or `0..1`; returns use `1..1`, `0..1` or `0..*`, with collections allowed for both primitive and entity results | constraint | CON-38, Section 5.10 | Proposed |
-| CON-53 | Method parameter defaults match their declarations | Parameters of router, service and repository methods | Input defaults follow the literal type and nullability rules in Section 5.10; return parameters have no default value | constraint | Section 5.10 | Proposed |
-| CON-54 | Declared method usage connects one caller to one method | Operation-level `Dependency` (REL-16 to REL-19) | Each dependency connects exactly one route or service method to exactly one service or repository method in a permitted direction | constraint | REL-16 to REL-19, Section 5.10 | Proposed |
-| CON-55 | Declared called methods resolve to owned operations | Called operations in REL-16 to REL-19 | Each target resolves to an actual operation owned by the referenced service or repository class, whose signature satisfies CON-49 to CON-53 | constraint | REL-16 to REL-19, Section 5.10 | Proposed |
+| CON-01 | Router belongs to an application | `«Router»` | Every router is owned by an `«ApplicationService»` component | constraint | REL-01 | Implemented |
+| CON-02 | Router prefix starts with a slash and has no trailing slash | `«Router»` | Every router has a non-empty `prefix` starting with `/` and not ending with `/`; neither an empty prefix nor `/` alone is allowed | constraint | MAP-08, Section 5.8 | Implemented |
+| CON-03 | Router methods are routes | `«Router»` | Every operation owned by a router has `«Route»` applied | constraint | REL-05 | Implemented |
+| CON-04 | Routes have unique HTTP methods and paths | `«Router»` | No two routes in the same router share the same (`method`, `path`) pair | constraint | MAP-04 | Implemented |
+| CON-05 | Router has at least one route | `«Router»` | Every router owns at least one route | critique | MAP-08 | Implemented |
+| CON-06 | Route belongs to a router | `«Route»` | Every route is owned by a `«Router»` class | constraint | MAP-04, REL-05 | Implemented |
+| CON-07 | Route has an HTTP method and a path extension | `«Route»` | Every route has a `method` and a non-empty `path` that is either `/` or starts with `/` without ending with `/` | constraint | MAP-04, Section 5.8 | Implemented |
+| CON-08 | Each route path parameter has exactly one matching input | `«Route»` | Every `{name}` in a route's path matches exactly one owned `in` parameter called `name` | constraint | MAP-04, Section 5.8 | Implemented |
+| CON-09 | Services and repositories belong to an application | `«Service»`, `«Repository»` | Every service and repository is owned by an `«ApplicationService»` component | constraint | REL-02, REL-03 | Implemented |
+| CON-10 | Entity belongs to a database | `«Entity»` | Every entity is owned by a `«DatabaseService»` component | constraint | REL-04 | Implemented |
+| CON-11 | Entity has exactly one primary-key attribute | `«Entity»` | Every entity has exactly one owned scalar attribute with `isID = true`; composite primary keys are rejected | constraint | PROP-02, Section 5.9 | Implemented |
+| CON-12 | Entity scalar columns have supported types | Scalar attributes owned by `«Entity»` | Every attribute with no association has a standard UML primitive type with a supported SQL mapping in Section 4.6; association ends are validated as relationships | constraint | PROP-01, PROP-03, Section 5.9 | Implemented |
+| CON-13 | Container ports are in range | `«ContainerizedService»` | Every container's `hostPort` and `containerPort` are in `1..65535` | constraint | MAP-00, MAP-01, MAP-02 | Implemented |
+| CON-14 | Containers use different host ports | `«ContainerizedService»` | No two containerized services share the same `hostPort` | constraint | MAP-00 | Implemented |
+| CON-15 | Database has a name and volume | `«DatabaseService»` | Every database has non-empty `databaseName` and `databaseVolume` values | constraint | MAP-02 | Implemented |
+| CON-16 | Application depends on a database | `«ApplicationService»` | Every application depends on at least one `«DatabaseService»` | critique | REL-09 | Implemented |
+| CON-17 | Dependencies connect permitted types | `Dependency` (including `Usage`) | Dependencies between containers, routers, services, repositories, entities and methods follow the directions listed in Section 4.2 | constraint | REL-09 to REL-14, REL-16 to REL-19 | Implemented |
+| CON-18 | Entity association has exactly two entity ends | Application-model `Association` | Every supported database association has exactly two distinct member-end properties, each typed by a `«Entity»` class | constraint | REL-15, Section 5.9 | Implemented |
+| CON-19 | Association multiplicities identify one foreign-key location | Entity `Association` | Exactly one end has multiplicity `1..1` or `0..1`, and the other has multiplicity `0..*`; one-to-one, many-to-many and other combinations are rejected initially | constraint | Section 4.7, Section 5.9 | Implemented |
+| CON-20 | Class has at most one microservice role | `Class` | A class has at most one of `«Entity»`, `«Service»`, `«Repository»` or `«Router»` applied | constraint | MAP-06 to MAP-09 | Implemented |
+| CON-21 | Route call chain uses exactly one repository | `«Route»` | Follow every method call from a route, including calls through services and utilities; all repository methods reached belong to exactly one repository | constraint | REL-16 to REL-19, Section 5.2 | Implemented |
+| CON-22 | Router and service dependencies have matching method calls | Dependencies from a `«Router»` or `«Service»` to a `«Service»` or `«Repository»` | At least one route on the router, or method on the service, calls a method on the specific service or repository it depends on (see Section 5.3) | constraint | REL-10 to REL-13, REL-16 to REL-19 | Implemented |
+| CON-23 | Method calls have matching router and service dependencies | Calls from routes or service methods to service or repository methods | Every call between different classes has the matching router-to-service, router-to-repository, service-to-repository or service-to-service dependency described in Section 5.3 | constraint | REL-10 to REL-13, REL-16 to REL-19 | Implemented |
+| CON-24 | Router uses exactly one repository | `«Router»` | Across the router's direct dependencies and all service dependencies in its scope, exactly one repository is reached; every route uses that same repository | constraint | REL-10 to REL-13, CON-21, Section 5.2 | Implemented |
+| CON-25 | Repository is used by at most one router scope | `«Repository»` | Two different routers cannot reach the same repository, either directly or through services | constraint | REL-10 to REL-13, Section 5.2 | Implemented |
+| CON-26 | Service is used by at most one router scope | `«Service»` | A service, including a utility service, cannot be shared between different router scopes; routes within the same router may share it | constraint | REL-10, REL-13, Section 5.2 | Implemented |
+| CON-27 | Router scope stays within one application | `«Router»` | The router and all services and repositories in its scope are owned by the same `«ApplicationService»` component | constraint | REL-01 to REL-03, Section 5.2 | Implemented |
+| CON-28 | Repository's application depends on each accessed entity's database | `«Repository»` | For every entity the repository accesses, the `«ApplicationService»` owning that repository has a dependency on the `«DatabaseService»` owning that entity | constraint | REL-03, REL-04, REL-09, REL-14, Section 5.4 | Implemented |
+| CON-29 | Application routes have unique HTTP methods and full URL patterns | `«ApplicationService»` | Across all routers in an application, no two routes have the same HTTP method and full URL pattern, even when their path parameter names differ | constraint | MAP-04, MAP-08, REL-01, REL-05, Section 5.5 | Implemented |
+| CON-30 | Modeled containers, classes and members have names | Containers, routers, services, repositories, entities, methods, entity columns and non-return parameters | Each element has a non-empty name with no leading or trailing whitespace; return parameters may be unnamed | constraint | MAP-00 to MAP-02, MAP-04, MAP-06 to MAP-09, Section 5.6 | Implemented |
+| CON-31 | Names are unique within their defined scopes | Named elements covered by CON-30 | Container, class, method, column and parameter names are unique in the scopes listed in Section 5.6 | constraint | Section 5.6 | Implemented |
+| CON-32 | Python class, method, column and parameter names are valid identifiers | Routers, services, repositories, entities, methods, entity columns and non-return parameters | Names are valid Python identifiers and are not reserved Python keywords for the target Python version | constraint | MAP-04, MAP-06 to MAP-09, Section 5.6 | Implemented |
+| CON-33 | Container has at most one application or database role | `Component` | A component cannot have both `«ApplicationService»` and `«DatabaseService»` applied | constraint | MAP-01, MAP-02, Section 5.7 | Implemented |
+| CON-34 | Router prefix contains only fixed path segments | `«Router»` | Router prefixes contain no `{` or `}` characters and cannot declare path parameters | constraint | MAP-08, Section 5.8 | Implemented |
+| CON-35 | Router prefix and route path contain only path content | `«Router»`, `«Route»` | Prefixes and paths contain no whitespace, control characters, backslashes, `//`, query strings, fragments, schemes, authorities or standalone `.` and `..` segments | constraint | MAP-04, MAP-08, Section 5.8 | Implemented |
+| CON-36 | Route placeholders are complete named path segments | `«Route»` | Each placeholder occupies a whole segment and has exactly the form `{name}`, where `name` matches `[A-Za-z_][A-Za-z0-9_]*`; empty, unmatched, nested, embedded or converter-style placeholders are invalid | constraint | MAP-04, Section 5.8 | Implemented |
+| CON-37 | Route path parameter names are not repeated | `«Route»` | No placeholder name occurs more than once in the same route path | constraint | MAP-04, Section 5.8 | Implemented |
+| CON-38 | Route path inputs are required scalar values | Inputs matched by CON-08 | Each matching `in` parameter has multiplicity `1..1`, no default value and a supported scalar type from Section 5.8 | constraint | MAP-04, Section 5.8 | Implemented |
+| CON-39 | Full route URL is the validated prefix plus path | `«Route»` | Concatenate the owning router's validated prefix and the route's validated path exactly; the result satisfies CON-35 to CON-37 and participates in application-wide uniqueness under CON-29 | constraint | MAP-04, MAP-08, CON-29, Section 5.8 | Implemented |
+| CON-40 | Primary-key attribute is required and scalar | Entity identifying attributes and entity-association ends | Every property with `isID = true` is an entity-owned scalar attribute with no association and multiplicity `1..1`; association ends cannot be primary-key attributes | constraint | PROP-02, Section 5.9 | Implemented |
+| CON-41 | Primary-key type is Integer or String | Entity's primary-key attribute | The identifying attribute uses the actual standard UML `Integer` or `String` type, mapped to `BIGINT` or `TEXT` respectively | constraint | Section 4.6, Section 5.9 | Implemented |
+| CON-42 | Association properties have consistent membership and ownership | Entity association ends | Each member-end property's `association` refers to that association; its owner is either that association or the entity typed by the opposite end | constraint | REL-15, Section 5.9 | Implemented |
+| CON-43 | Associated entities belong to the same database | Entity `Association` | Both end types are entities owned by the same `«DatabaseService»` component | constraint | REL-04, REL-15, Section 5.9 | Implemented |
+| CON-44 | Association role names are usable and unambiguous | Entity association ends | Both ends have non-empty Python identifier role names that are not reserved keywords; roles interpreted as properties on the same entity are unique and do not duplicate scalar attribute names | constraint | Section 4.7, Section 5.9 | Implemented |
+| CON-45 | Generated foreign-key column names do not collide | Referencing `«Entity»` | Each derived foreign-key name is distinct from scalar column names and every other generated foreign-key name in that table under the target SQL identifier rules | constraint | SQL-04, Section 5.9 | Implemented |
+| CON-46 | Entity references participate in explicit associations | Entity-typed attributes owned by `«Entity»` | An attribute typed by another entity or by its own entity class participates in a valid association and is included in that association's member ends | constraint | REL-15, Section 5.9 | Implemented |
+| CON-47 | Entity reference resolves to one mapped primary key | Reference end of an entity association | The target entity has exactly one valid primary-key attribute satisfying CON-11, CON-40 and CON-41, from which SQL and Python foreign-key types can be derived | constraint | SQL-05, Section 5.9 | Implemented |
+| CON-48 | Scalar entity attributes are single-valued | Attributes owned by `«Entity»` with no association | Each scalar attribute has multiplicity `1..1` or `0..1`; collection-valued scalar columns require a separate mapping | constraint | PROP-01, SQL-01, Section 5.9 | Implemented |
+| CON-49 | Method parameters reference supported types | Parameters of router, service and repository methods | Every input and return parameter resolves to the standard UML `String`, `Integer`, `Boolean` or `Real` type, or to a class with `«Entity»` applied | constraint | MAP-04, MAP-06 to MAP-09, Section 5.10 | Implemented |
+| CON-50 | Method parameters use input or return directions | Parameters of router, service and repository methods | Only `in` and `return` directions are supported; `out` and `inout` are rejected | constraint | Section 5.10 | Implemented |
+| CON-51 | Method has at most one return parameter | Router, service and repository methods | Each method has zero or one owned parameter with direction `return`; zero means no result value | constraint | Section 5.10 | Implemented |
+| CON-52 | Method parameters use supported multiplicities | Parameters of router, service and repository methods | Inputs use `1..1` or `0..1`; returns use `1..1`, `0..1` or `0..*`, with collections allowed for both primitive and entity results | constraint | CON-38, Section 5.10 | Implemented |
+| CON-53 | Method parameter defaults match their declarations | Parameters of router, service and repository methods | Input defaults follow the literal type and nullability rules in Section 5.10; return parameters have no default value | constraint | Section 5.10 | Implemented |
+| CON-54 | Declared method usage connects one caller to one method | Operation-level `Dependency` (REL-16 to REL-19) | Each dependency connects exactly one route or service method to exactly one service or repository method in a permitted direction | constraint | REL-16 to REL-19, Section 5.10 | Implemented |
+| CON-55 | Declared called methods resolve to owned operations | Called operations in REL-16 to REL-19 | Each target resolves to an actual operation owned by the referenced service or repository class, whose signature satisfies CON-49 to CON-53 | constraint | REL-16 to REL-19, Section 5.10 | Implemented |
 
 ### 5.1 EVL Implementation
 
-The existing rules live in [`validation/microservices.evl`](../validation/microservices.evl);
-each message starts with its `CON-xx` id. See the README for how to run it in Eclipse.
-The dependency-chain proposal is not yet implemented there: CON-17 currently permits
-only REL-16 at operation level, CON-21 still requires a direct route-to-repository
-dependency, and CON-22 to CON-27 have not been added.
-CON-28 to CON-39, which cover database access consistency, application-wide route
-uniqueness, names, container roles and URL validation, are also not yet implemented.
-The existing CON-02, CON-07 and CON-08 checks have not yet been updated to enforce
-the stronger prefix, path and parameter requirements specified here.
-CON-40 to CON-48 and the SQL mappings in Section 4.7 are not yet implemented.
-The existing CON-11, CON-12, CON-18 and CON-19 checks also need updating for the
-single-column key, scalar-property and supported-association requirements.
-CON-49 to CON-55, covering method signatures, return types and declared method
-usage, are also proposed and not yet implemented in EVL.
+The canonical rules live in [`validation/microservices.evl`](../validation/microservices.evl).
+All 55 constraints are implemented; each message starts with its `CON-xx` id.
+CON-05 and CON-16 are critiques (warnings); all other checks report errors.
+The validator recognizes inherited stereotypes and canonical UML primitive types,
+excludes profile definitions and library elements, and traverses both class scopes
+and operation call chains with visited sets so cycles terminate.
+
+The executable regression suite is
+[`validation/tests/MicroservicesValidationTest.java`](../validation/tests/MicroservicesValidationTest.java),
+run with [`validation/run_tests.py`](../validation/run_tests.py). It creates isolated
+in-memory models from the profile and standard primitive library, with valid
+scenarios and negative cases for every constraint, plus malformed-model cases.
+No existing repository application model is used as a specification or test fixture.
+See the README for Eclipse launch settings and the headless test command.
+
+For CON-45, the current comparison follows the quoted identifiers shown in Section
+4.7: case is preserved and PostgreSQL's standard 63-byte UTF-8 identifier limit is
+applied when detecting collisions. Final SQL generation must preserve that policy
+or update the comparison when the identifier-rendering decision is settled.
+Python name checks use NFKC normalization and the Java runtime's Unicode identifier
+repertoire, with Python reserved keywords excluded.
+
+SQL/YAML generation, API serialization and the behavior of handwritten method
+bodies remain separate implementation tasks. EVL validates their declared model
+inputs and relationships; it does not execute those generators or methods.
 
 ### 5.2 Route Call Chains and Isolated Router Scopes (CON-21, CON-24 to CON-27)
 
@@ -821,9 +833,9 @@ be implemented using its existing primitive types and fixed foreign-key actions.
 
 ## 7. Completion Checklist
 
-Checked items record completed specification work. EVL validation and generation
-remain separate implementation tasks; constraint rows retain their `Proposed`
-status until their implementation and verification are reviewed.
+Checked items record completed specification or validation work. `Implemented`
+in the constraint table means an executable EVL check exists. Code generation and
+end-to-end runtime verification remain separate tasks.
 
 - [x] Document all 9 concepts with unique mapping IDs, source elements, UML metaclasses, stereotypes and tagged-value mappings.
 - [x] Define structural ownership, permitted class/method dependency directions, stereotype generalization and the `HttpMethod` literals.
@@ -835,9 +847,9 @@ status until their implementation and verification are reviewed.
 - [x] Define method parameter types, directions, defaults, return counts/multiplicities and declared method usage (CON-49 to CON-55).
 - [ ] Verify stereotype names, inherited tags, primitive type references and enumeration literals against the Papyrus profile and standard type library.
 - [ ] Settle the baseline generation policies in Section 6; keep optional date/type and association-action extensions deferred unless selected for implementation.
-- [ ] Update existing EVL checks CON-01 to CON-21 to match the current specification, including stronger URL/key/association rules, transitive repository access, inherited container-role detection and exclusion of profile definitions.
-- [ ] Implement the missing EVL checks CON-22 to CON-55.
-- [ ] Verify every constraint with positive and negative cases built from the profile, including scope isolation, URL conflicts, foreign-key derivation and method signatures; avoid relying on existing repository models as the specification.
+- [x] Update existing EVL checks CON-01 to CON-21 to match the current specification, including stronger URL/key/association rules, transitive repository access, inherited container-role detection and exclusion of profile definitions.
+- [x] Implement EVL checks CON-22 to CON-55.
+- [x] Verify every constraint with valid baseline scenarios and negative cases built from the profile, including scope isolation, URL conflicts, foreign-key derivation, method signatures and malformed inputs; no existing repository application models are used.
 - [ ] Define the YAML schema and implement/test the UML-to-YAML transformation, preserving type references, multiplicities, dependencies and derived SQL mappings.
 - [ ] Implement/test YAML-to-Python/FastAPI, PostgreSQL and Docker generation, including scoped dependency wiring and declared-call guidance for handwritten methods.
 - [ ] Verify generated applications and databases together, including key uniqueness, nullability, foreign keys, delete restrictions and the selected API representations.
